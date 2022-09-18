@@ -212,7 +212,7 @@ mytheme<-theme_bw()+theme(legend.position="right",
   par(cex = 1)
   plotEigengeneNetworks(MET, '', marDendro = c(0,4,1,6), marHeatmap = c(5,6,2,1), cex.lab = 1.2, xLabelsAngle  = 90)
 
-  cell_type <- read.table("/home/dulab/Documents/wrok/flu_paper/data/result_newest/cibersort/TME.results.output_dataset4.txt",header = T
+  cell_type <- read.table("/home/dulab/Documents/wrok/flu_paper/data/result_newest/cibersort/TME.results.output_train.txt",header = T
                           ,row.names = 1,sep ="\t" )
   cell_type <- cell_type[,-c(17,18)]
   cell_type<-cell_type[,c(1,16)]#4,
@@ -283,7 +283,7 @@ mytheme<-theme_bw()+theme(legend.position="right",
     inModule = (moduleColors==module)
     modProbes = probes[inModule]    
     ###output the module genes
-    write.csv(modProbes,paste(module,'genestrain.csv',sep = ''))
+    write.csv(modProbes,paste(module,'genes_train.csv',sep = ''))
     
     
     ##output tom matrix :genes  to vis and cytoscpae
@@ -292,7 +292,7 @@ mytheme<-theme_bw()+theme(legend.position="right",
     dimnames(modTOM) = list(modProbes, modProbes)
     
     vis = exportNetworkToVisANT(modTOM,
-                                file = paste("VisANTInput-median-", module, "_3dataset.txt", sep=""),
+                                file = paste("VisANTInput-median-", module, "train.txt", sep=""),
                                 weighted = TRUE,
                                 threshold = 0)
     

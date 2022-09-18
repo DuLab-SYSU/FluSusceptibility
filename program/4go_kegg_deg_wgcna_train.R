@@ -209,9 +209,9 @@ term_lengthfun <- function(term,k=50){
 setwd("/home/dulab/Documents/wrok/flu_paper/data/result_newest/")  
 #setwd("~/result1/1deg/")
 path1<-getwd()
-gene_up<-read.csv('updeg_h3n2_4_dataset.csv',row.names = 1)  ##478
-gene_down<-read.csv('downdeg_h3n2_4_dataset.csv',row.names = 1)  ##267
-backgene<-read.csv('exprs_4_dataset.csv',row.names = 1)   #72*8286
+gene_up<-read.csv('updeg_h3n2_train.csv',row.names = 1)  ##478
+gene_down<-read.csv('downdeg_h3n2_train.csv',row.names = 1)  ##267
+backgene<-read.csv('exprs_train.csv',row.names = 1)   #72*8286
 pic1<-'up_dataset4'
 pic2<-'down_dataset4'
 
@@ -330,60 +330,60 @@ allGOPlotfun <- function(goresult,picturename){
 
 pic3<-'salmon'; pic4<-'yellow';pic5='magenta';pic6='tan';pic7='brown';pic8='green';pic9='greenyellow';pic10='turquoise';pic11='purple';
 pic12='red';pic13='cyan';pic14='lightcyan';pic15='pink'
-backgene<-read.csv('exprs_4_dataset.csv',row.names = 1)   #72*8286
+backgene<-read.csv('exprs_train.csv',row.names = 1)   #72*8286
 
-tangenes<-read.csv('tangenes_4dataset.csv',row.names = 1) 
-midnightblue<-read.csv('midnightbluegenes_4dataset.csv',row.names = 1) 
-greengenes<-read.csv('greengenes_4dataset.csv',row.names = 1) 
-#yellowgenes<-read.csv('yellowgenes_4dataset.csv',row.names = 1)
-#salmongenes<-read.csv('salmongenes_4dataset.csv',row.names = 1)
-magentagenes<-read.csv('magentagenes_4dataset.csv',row.names = 1)
-#purplegenes<-read.csv('purplegenes_4dataset.csv',row.names = 1)
-#redgenes<-read.csv('redgenes_4dataset.csv',row.names = 1)
-#bluegenes<-read.csv("bluegenes_4dataset.csv",row.names = 1)
-#greenyellow<-read.csv('greenyellowgenes_4dataset.csv',row.names = 1)
+tangenes<-read.csv('tangenes_train.csv',row.names = 1) 
+midnightblue<-read.csv('midnightbluegenes_train.csv',row.names = 1) 
+greengenes<-read.csv('greengenes_train.csv',row.names = 1) 
+#yellowgenes<-read.csv('yellowgenes_train.csv',row.names = 1)
+#salmongenes<-read.csv('salmongenes_train.csv',row.names = 1)
+magentagenes<-read.csv('magentagenes_train.csv',row.names = 1)
+#purplegenes<-read.csv('purplegenes_train.csv',row.names = 1)
+#redgenes<-read.csv('redgenes_train.csv',row.names = 1)
+#bluegenes<-read.csv("bluegenes_train.csv",row.names = 1)
+#greenyellow<-read.csv('greenyellowgenes_train.csv',row.names = 1)
 #cyangenes<-read.csv('cyangenes.csv',row.names = 1)
 #lightcyan<-read.csv('lightcyangenes.csv',row.names = 1)
 #pinkgenes<-read.csv('pinkgenes.csv',row.names = 1)
 #backgene2<-as.data.frame(t(read.csv("~/result1/2WGCNA/h3n2_wgcnaexprs_4143.csv",row.names = 1)))
-blackgenes<-read.csv('blackgenes_4dataset.csv',row.names = 1) 
+blackgenes<-read.csv('blackgenes_train.csv',row.names = 1) 
 
 path1<-getwd()
-allgofun1(tangenes,backgene,"tan_4dataset")
+allgofun1(tangenes,backgene,"tan_train")
 setwd(path1)
-allgofun1(magentagenes,backgene,"magenta_4dataset")
+allgofun1(magentagenes,backgene,"magenta_train")
 setwd(path1)
-#allgofun1(purplegenes,backgene,"purple_4dataset")
+#allgofun1(purplegenes,backgene,"purple_train")
 #setwd(path1)
-#allgofun1(greenyellow,backgene,"greenyellow_4dataset")
+#allgofun1(greenyellow,backgene,"greenyellow_train")
 #setwd(path1)
-allgofun1(midnightblue,backgene,"midightblue_4dataset")
+allgofun1(midnightblue,backgene,"midightblue_train")
 setwd(path1)
 
-allgofun1(blackgenes,backgene,"black_4dataset")
+allgofun1(blackgenes,backgene,"black_train")
 setwd(path1)
-allgofun1(greengenes,backgene,"green_4dataset")
+allgofun1(greengenes,backgene,"green_train")
 setwd(path1)
-#allgofun1(cyangenes,backgene,"cyan_4dataset")
+#allgofun1(cyangenes,backgene,"cyan_train")
 #setwd(path1)
 
-tangoresult<-read.csv('tan_4dataset/tan_4dataset_go.csv',row.names = 1)   ##13
+tangoresult<-read.csv('tan_train/tan_train_go.csv',row.names = 1)   ##13
 tangoresult<- tangoresult[tangoresult$ONTOLOGY=='BP' | tangoresult$ONTOLOGY=='MF',]
-midnightbluegoresult<-read.csv('midightblue_4dataset/midightblue_4dataset_go.csv',row.names = 1)   ##13
+midnightbluegoresult<-read.csv('midightblue_train/midightblue_train_go.csv',row.names = 1)   ##13
 midnightbluegoresult<- midnightbluegoresult[midnightbluegoresult$ONTOLOGY=='BP' | midnightbluegoresult$ONTOLOGY=='MF',]
 
-magentagoresult<-read.csv('magenta_4dataset/magenta_4dataset_go.csv',row.names = 1)   ##1
+magentagoresult<-read.csv('magenta_train/magenta_train_go.csv',row.names = 1)   ##1
 magentagoresult<- magentagoresult[magentagoresult$ONTOLOGY=='BP' | magentagoresult$ONTOLOGY=='MF',]
 
-#purplegoresult<-read.csv('purple_4dataset/purple_4dataset_go.csv',row.names = 1)   ##52
+#purplegoresult<-read.csv('purple_train/purple_train_go.csv',row.names = 1)   ##52
 #purplegoresult<- purplegoresult[purplegoresult$ONTOLOGY=='BP' | purplegoresult$ONTOLOGY=='MF',]
-blackgoresult<-read.csv('black_4dataset/black_4dataset_go.csv',row.names = 1)   ##1
+blackgoresult<-read.csv('black_train/black_train_go.csv',row.names = 1)   ##1
 blackgoresult<- blackgoresult[blackgoresult$ONTOLOGY=='BP' | blackgoresult$ONTOLOGY=='MF',]
-greengoresult<-read.csv('green_4dataset/green_4dataset_go.csv',row.names = 1)   ##1
+greengoresult<-read.csv('green_train/green_train_go.csv',row.names = 1)   ##1
 greengoresult<- greengoresult[greengoresult$ONTOLOGY=='BP' | greengoresult$ONTOLOGY=='MF',]
 
 
-#greenyellowgoresult<-read.csv('greenyellow_4dataset/greenyellow_4dataset_go.csv',row.names = 1)   ##16
+#greenyellowgoresult<-read.csv('greenyellow_train/greenyellow_train_go.csv',row.names = 1)   ##16
 #greenyellowgoresult<-greenyellowgoresult[greenyellowgoresult$ONTOLOGY=='BP' |greenyellowgoresult$ONTOLOGY=='MF',]
 
 
@@ -463,15 +463,15 @@ allGOPlotfun1 <- function(goresult,picturename){
 } 
 allGOPlotfun1(all_me,"dataset4_me1")
 
-#tangoresult<-read.csv('tan_4dataset/tan_4dataset_kegg.csv',row.names = 1)   ##0
+#tangoresult<-read.csv('tan_train/tan_train_kegg.csv',row.names = 1)   ##0
 
-magentagoresult<-read.csv('magenta_4dataset/magenta_4dataset_kegg.csv',row.names = 1)   ##0
+magentagoresult<-read.csv('magenta_train/magenta_train_kegg.csv',row.names = 1)   ##0
 magentagoresult$Module <- "MEmagenta"
-#greenyellowgoresult<-read.csv('greenyellow_4dataset/greenyellow_4dataset_kegg.csv',row.names = 1)   ##4
+#greenyellowgoresult<-read.csv('greenyellow_train/greenyellow_train_kegg.csv',row.names = 1)   ##4
 #greenyellowgoresult$Module <- "MEgreenyellow"
-tangoresult<-read.csv('tan_4dataset/tan_4dataset_kegg.csv',row.names = 1)   ##0
+tangoresult<-read.csv('tan_train/tan_train_kegg.csv',row.names = 1)   ##0
 tangoresult$Module <- "MEtan"
-#purplegoresult<-read.csv('purple_4dataset/purple_4dataset_kegg.csv',row.names = 1)   ##0
+#purplegoresult<-read.csv('purple_train/purple_train_kegg.csv',row.names = 1)   ##0
 
 
 
@@ -482,22 +482,22 @@ allGOPlotfun(all_me,"dataset4_me_kegg")
 
 
 ####################################################333
-magentagoresult<-read.csv('magenta_4dataset/magenta_4dataset_kegg.csv',row.names = 1)   ##0
+magentagoresult<-read.csv('magenta_train/magenta_train_kegg.csv',row.names = 1)   ##0
 magentagoresult$Module <- "MEmagenta"
-#greenyellowgoresult<-read.csv('greenyellow_4dataset/greenyellow_4dataset_kegg.csv',row.names = 1)   ##4
+#greenyellowgoresult<-read.csv('greenyellow_train/greenyellow_train_kegg.csv',row.names = 1)   ##4
 #greenyellowgoresult$Module <- "MEgreenyellow"
-greengoresult<-read.csv('green_4dataset/green_4dataset_kegg.csv',row.names = 1)   ##4
+greengoresult<-read.csv('green_train/green_train_kegg.csv',row.names = 1)   ##4
 greengoresult$Module <- "MEgreen"
-tangoresult<-read.csv('tan_4dataset/tan_4dataset_kegg.csv',row.names = 1)   ##0
+tangoresult<-read.csv('tan_train/tan_train_kegg.csv',row.names = 1)   ##0
 tangoresult$Module<-"MEtan"
-midnightbluegoresult<-read.csv('midightblue_4dataset/midightblue_4dataset_kegg.csv',row.names = 1)   ##0
+midnightbluegoresult<-read.csv('midightblue_train/midightblue_train_kegg.csv',row.names = 1)   ##0
 midnightbluegoresult$Module<-"MEmidnightblue"
 
-#redgoresult<-read.csv('red_4dataset/red_4dataset_kegg.csv',row.names = 1)   ##0
+#redgoresult<-read.csv('red_train/red_train_kegg.csv',row.names = 1)   ##0
 #redgoresult$Module<-"MEred"
-#cyangoresult<-read.csv('cyan_4dataset/cyan_4dataset_kegg.csv',row.names = 1)   ##0
+#cyangoresult<-read.csv('cyan_train/cyan_train_kegg.csv',row.names = 1)   ##0
 #cyangoresult$Module<-"MEcyan"
-blackgoresult<-read.csv('black_4dataset/black_4dataset_kegg.csv',row.names = 1)   ##0
+blackgoresult<-read.csv('black_train/black_train_kegg.csv',row.names = 1)   ##0
 blackgoresult$Module<-"MEblack"
 
 all_me <- rbind(magentagoresult[1:5,],midnightbluegoresult[1:5,],blackgoresult[1:5,],greengoresult,tangoresult)#,)tangoresult,purplegoresult

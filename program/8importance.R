@@ -178,7 +178,7 @@ GOPlotfun(goresult,'dm_me_inter','all')
 keggPlotfun(keggresult,'KEGG_dm_me_inter','all')
 
 #########data4
-hub_importance <- read.csv("/home/dulab/Documents/wrok/C/deg_module__inter_importance_dataset4.csv")
+hub_importance <- read.csv("/home/dulab/Documents/wrok/C/deg_module__inter_importance_train.csv")
 hub_importance<-hub_importance[,-1]
 hub_importance$type <- "importance of module and deg genes"
 hub_importance<-hub_importance[order(hub_importance$importance,decreasing = F),]

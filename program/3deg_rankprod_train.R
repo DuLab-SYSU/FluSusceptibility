@@ -3,8 +3,8 @@
 library(RankProd)
 setwd("/home/dulab/Documents/wrok/flu_paper/data/result_newest/")  
 
-exprs_h3n2<-read.csv('exprs_4_dataset.csv',row.names = 1)
-h3n2_group <- read.csv("h3n2_group_4_dataset.csv",row.names = 1)
+exprs_h3n2<-read.csv('exprs_train.csv',row.names = 1)
+h3n2_group <- read.csv("h3n2_group_train.csv",row.names = 1)
 
 
 exprs.gnames<-rownames(exprs_h3n2)
@@ -24,8 +24,8 @@ commgene <- intersect(rownames(up),rownames(down))
 
 up<-up[!rownames(up)%in%commgene,]
 down<-down[!rownames(down)%in%commgene,]
-write.csv(up,'updeg_h3n2_4_dataset.csv')  
-write.csv(down,'downdeg_h3n2_4_dataset.csv')  
+write.csv(up,'updeg_h3n2_train.csv')  
+write.csv(down,'downdeg_h3n2_train.csv')  
 geneFC <- RP.adv.out$AveFC
 
 stable_gene <- data.frame(gene=setdiff(setdiff(exprs.gnames,rownames(up)),rownames(down)),type="unchanged")
@@ -35,7 +35,7 @@ downgene <- data.frame(gene=setdiff(rownames(down),rownames(up)),type="down")
 allgene <- rbind(upgene,downgene,stable_gene)#,stable_gene1)
 
 colnames(geneFC)<-c("AveFC")
-write.csv(geneFC,"gene_fc_4_dataset.csv",row.names = T)
+write.csv(geneFC,"gene_fc_train.csv",row.names = T)
 
 
 #================================[ make heatmap of DEG-rankprod ]==============================
@@ -46,10 +46,10 @@ write.csv(geneFC,"gene_fc_4_dataset.csv",row.names = T)
 setwd("/home/dulab/Documents/wrok/flu_paper/data/result_newest/")  
 
   
-  up_deg<-read.csv('updeg_h3n2_4_dataset.csv',row.names = 1)  ##477
-  down_deg<-read.csv('downdeg_h3n2_4_dataset.csv',row.names = 1)  ##273
+  up_deg<-read.csv('updeg_h3n2_train.csv',row.names = 1)  ##477
+  down_deg<-read.csv('downdeg_h3n2_train.csv',row.names = 1)  ##273
   degs<-rbind(up_deg,down_deg)
-  exprs<-read.csv('exprs_4_dataset.csv',row.names = 1)  ##8286*72
+  exprs<-read.csv('exprs_train.csv',row.names = 1)  ##8286*72
   gene_pfp <- RP.adv.out$pfp
   gene_pfp<- as.data.frame(gene_pfp)
   gene_pfp$gene <- rownames(gene_pfp)
@@ -57,7 +57,7 @@ setwd("/home/dulab/Documents/wrok/flu_paper/data/result_newest/")
   gene_pval<- as.data.frame(gene_pval)
   gene_pval$gene <- rownames(gene_pval)
   
-  geneFC <- read.csv("gene_fc_4_dataset.csv",header = T)
+  geneFC <- read.csv("gene_fc_train.csv",header = T)
   colnames(geneFC)<- c("gene","aveFC")
   
   alldata <- cbind(gene_pfp,gene_pval,geneFC)

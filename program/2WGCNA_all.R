@@ -52,6 +52,9 @@ mytheme<-theme_bw()+theme(legend.position="right",
   exprs<-apply(exprs_h3n2,1,var)
   exprs<-as.data.frame(t(exprs_h3n2[which(exprs>quantile(exprs, probs = seq(0, 1, 0.2))[5]),]))  ##1679*41
   
+  h3n2_group<-h3n2_group[!rownames(h3n2_group) %in% c("GSM429301"),]
+  write.csv(exprs_h3n2,"h3n2_combat_data1.csv")
+  write.csv(h3n2_group,"group_h3n21.csv.csv")
   
   Traits<-Traits[!rownames(Traits)%in%c("GSM429301"),]#"subject11",
   write.csv(exprs,'h3n2_wgcnaexprs_1679_all.csv')
