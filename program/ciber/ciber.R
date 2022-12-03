@@ -4,7 +4,7 @@ library(tidyr)
 library(tibble)
 library(ggpubr)
 library(ggsci)
-library(CIBERSORT)
+
 mytheme<-theme_bw()+theme(legend.position="right",
                           #panel.border=element_blank(),
                           panel.grid.major=element_blank(),
@@ -26,76 +26,46 @@ mytheme<-theme_bw()+theme(legend.position="right",
                          )
 #https://www.jianshu.com/p/03a7440c0960
 #https://cloud.tencent.com/developer/article/1622907
-###############pre-process data
-exprs_h3n2<-read.csv('/home/dulab/Documents/wrok/flu_paper/data/result_newest/h3n2_combat_data.csv',row.names = 1)
-exprs_h3n2$gene <- rownames(exprs_h3n2)
-exprs_h3n2<-exprs_h3n2[,c('gene',setdiff(c(colnames(exprs_h3n2)[1:42]),c("GSM429301")))]#("subject11"
-#exprs_h3n2<-exprs_h3n2[!colnames(exprs)%in%c("subject11","GSM429301"),]
-#####all
-h3n2_group <- read.csv("/home/dulab/Documents/wrok/flu_paper/data/result_newest/group_h3n2.csv",row.names = 1)
-h3n2_group<-h3n2_group[!(h3n2_group$subject)%in%c("GSM429301"),]#"subject11",
+setwd("/home/dulab/Documents/wrok/flu_paper/data/CODE_FI/ciber")  
 
-write.csv(exprs_h3n2[,-1],"h3n2_combat_data1.csv",sep = "\t",quote = F,row.names = T)
-
-write.table(exprs_h3n2,"h3n2_combat_data.txt",sep = "\t",quote = F,row.names = F)
-write.csv(h3n2_group,"group_h3n21.csv")
-##############################################################################################################################
-
-
-###########################################################################################################################
-###########################################################################################################################
-#######data contatined tests
-exprs_h3n2<-read.csv('/home/dulab/Documents/wrok/flu_paper/data/result_newest/exprs_train.csv',row.names = 1)
-exprs_h3n2$gene <- rownames(exprs_h3n2)
-exprs_h3n2<-exprs_h3n2[,c('gene',colnames(exprs_h3n2)[1:33])]
-
-h3n2_group <- read.csv("/home/dulab/Documents/wrok/flu_paper/data/result_newest/h3n2_group_train.csv",row.names = 1)
-
-write.table(exprs_h3n2,"h3n2_combat_train.txt",sep = "\t",quote = F,row.names = F)
-
-
-###################calculate using self function
-
+source("CIBERSORT.R")
+LM22.file <- "LM22.txt"
 
 ciber_fun <- function(expression,group,filename){
   source("CIBERSORT.R")
   LM22.file <- "LM22.txt"
   TME.results = CIBERSORT(LM22.file,expression,perm = 1000, QN = TRUE)
-  TME.results <-TME.results[,-c(8,10,12,17,20,21)]
+  TME.results <-TME.results[,-c(8,12,17,21)]
   write.table(TME.results, paste("TME.results.output",paste(filename,".txt",sep=""),sep = "_"), 
               sep = "\t", row.names = T, col.names = T, quote = F)
-#}
-
-#ciber_fun2 <- function(ciber_res){
- # TME.results <- read.table(ciber_res,header = T,row.names = 1,sep = "\t")
   dd1 <- TME.results %>% 
     as.data.frame() %>% 
-    rownames_to_column("subject") %>% 
-    pivot_longer(cols=2:17,
+    rownames_to_column("gseID") %>% 
+    pivot_longer(cols=2:19,
                  names_to= "celltype",
                  values_to = "Proportion")
   
   dd1<- as.data.frame(dd1)
-  dd2 <- merge(dd1,h3n2_group,by="subject")
-  
+  dd2 <- merge(dd1,h3n2_group,by="gseID")
+  write.csv(dd2,paste(filename,"_ciber_result.csv",sep=""),sep = "\t", row.names = T, col.names = T, quote = F)
   cols =c("#FF0099", "#E69F00", "#56B4E9", "#009E73", "#F0E442", "#0072B2", "#D55E00", "#CC79A7","#990000","#9900cc","#66FF66","#663300","#0000FF","#CC0033","#FF0000","#000099","#660066","#333333") 
   #"#999999",
-  pp<-ggplot(dd1,aes(subject,Proportion,fill = celltype)) +  scale_fill_manual(values = cols)+
-    geom_bar(stat = "identity",alpha=0.6) +
+  pp<-ggplot(dd2,aes(gseID,Proportion,fill = celltype)) +  scale_fill_manual(values = cols)+
+    geom_bar(stat = "identity",alpha=0.8) +
     labs(fill = "",x = "",y = "Estiamted Proportion") + 
-    scale_y_continuous(expand = c(0.01,0)) +mytheme+theme(axis.text.x=element_text(size=12,angle = 90))
-  pdf(paste(filename,"proportion.pdf",sep = "_"),height=6,width=16)
+    scale_y_continuous(expand = c(0.01,0)) +mytheme+theme(axis.text.x=element_text(size=12,angle = 90))+facet_wrap(~group,nrow=2,scales = "free_x")
+  pdf(paste(filename,"proportion.pdf",sep = "_"),height=9,width=16)
   print(pp)
   dev.off()
   
-  # ggplot(dd1,aes(celltype,Proportion,fill = celltype))+geom_boxplot()+mytheme+theme(axis.text.x=element_text(size=12,angle = 90))+
-  # guides(fill=guide_legend(ncol=1))+ labs(x="",y="Proportion",fill="")
+ # ggplot(dd1,aes(celltype,Proportion,fill = celltype))+geom_boxplot()+mytheme+theme(axis.text.x=element_text(size=12,angle = 90))+
+   # guides(fill=guide_legend(ncol=1))+ labs(x="",y="Proportion",fill="")
   
   pp<-ggplot(dd2,aes(celltype,Proportion,fill=group))+geom_boxplot()+mytheme+
     theme(axis.text.x=element_text(size=12,angle = 90))+
     scale_fill_manual(values=c("#085A9C","#EF0808"))+
     guides(fill=guide_legend(ncol=1))+ labs(x="",y="Proportion",fill="")+
-    stat_compare_means(aes(group = group,label = ..p.signif..),method = "wilcox.test")#wilcox.test
+    stat_compare_means(aes(group = group,label = ..p.signif..),method = "wilcox.test")#kruskal.test
   
   pdf(paste(filename,"sig.pdf",sep = "_"),height=6,width=12)
   print(pp)
@@ -105,7 +75,7 @@ ciber_fun <- function(expression,group,filename){
     theme(axis.text.x=element_text(size=12,angle = 90))+
     scale_fill_manual(values=c("#085A9C","#EF0808"))+
     guides(fill=guide_legend(ncol=1))+ labs(x="",y="Proportion",fill="")+
-    stat_compare_means(aes(group = group,label = ..p.signif..),method = "wilcox.test",method.args = list(alternative = "greater"))#wilcox.test
+    stat_compare_means(aes(group = group,label = ..p.signif..),method = "wilcox.test",method.args = list(alternative = "greater"))#kruskal.test
   pdf(paste(filename,"greater.pdf",sep = "_"),height=6,width=12)
   print(pp)
   dev.off()
@@ -113,13 +83,13 @@ ciber_fun <- function(expression,group,filename){
     theme(axis.text.x=element_text(size=12,angle = 90))+
     scale_fill_manual(values=c("#085A9C","#EF0808"))+
     guides(fill=guide_legend(ncol=1))+ labs(x="",y="Proportion",fill="")+
-    stat_compare_means(aes(group = group,label = ..p.signif..),method = "wilcox.test",method.args = list(alternative = "less"))#wilcox.test
+    stat_compare_means(aes(group = group,label = ..p.signif..),method = "wilcox.test",method.args = list(alternative = "less"))#kruskal.test
   pdf(paste(filename,"less.pdf",sep = "_"),height=6,width=12)
   print(pp)
   dev.off()
   sink(paste(filename,"log.txt"), split =T)
   naive_b <- subset(dd2,celltype=="B cells naive")
-  tt<-wilcox.test(Proportion~group,naive_b)#Kruskal-Wallis chi-squared = 12.227, df = 1, p-value = 0.0004711
+  tt<-kruskal.test(Proportion~group,naive_b)#Kruskal-Wallis chi-squared = 12.227, df = 1, p-value = 0.0004711
   #Kruskal-Wallis chi-squared = 13.356, df = 1, p-value = 0.0002576
   print(filename)
   print("B cells naive")
@@ -139,7 +109,7 @@ ciber_fun <- function(expression,group,filename){
   dev.off()
   
   mon <- subset(dd2,celltype=="Monocytes")#Kruskal-Wallis chi-squared = 4.0445, df = 1, p-value = 0.04432
-  tt<-wilcox.test(Proportion~group,mon)#Kruskal-Wallis chi-squared = 4.8281, df = 1, p-value = 0.028
+  tt<-kruskal.test(Proportion~group,mon)#Kruskal-Wallis chi-squared = 4.8281, df = 1, p-value = 0.028
   
   print(filename)
   print("Monocytes")
@@ -157,10 +127,10 @@ ciber_fun <- function(expression,group,filename){
   dev.off()
   
   tcell <- subset(dd2,celltype=="T cells CD4 memory activated")
-  tt<-wilcox.test(Proportion~group,tcell)#Kruskal-Wallis chi-squared = 8.0555, df = 1, p-value = 0.004536
+  tt<-kruskal.test(Proportion~group,tcell)#Kruskal-Wallis chi-squared = 8.0555, df = 1, p-value = 0.004536
   print(filename)
   print("T cells CD4 memory activated")
-  print(tt)
+   print(tt)
   #Kruskal-Wallis chi-squared = 7.4728, df = 1, p-value = 0.006264
   tt<- wilcox.test(Proportion~group,tcell)#p-value = 0.006451
   print(tt)
@@ -176,7 +146,7 @@ ciber_fun <- function(expression,group,filename){
   dev.off()
   
   neutrophils <- subset(dd2,celltype=="Neutrophils")
-  tt<-wilcox.test(Proportion~group,neutrophils)#Kruskal-Wallis chi-squared = 3.9041, df = 1, p-value = 0.04817
+  tt<-kruskal.test(Proportion~group,neutrophils)#Kruskal-Wallis chi-squared = 3.9041, df = 1, p-value = 0.04817
   print(filename)
   print("Neutrophils")
   print(tt)
@@ -194,16 +164,26 @@ ciber_fun <- function(expression,group,filename){
   print(pp)
   dev.off()
 }
-
-############all data
-setwd('/home/dulab/Documents/wrok/flu_paper/data/result_newest/cibersort/')
-
-exp.file <- "h3n2_combat_data.txt"#h3n2_combat_data.txt
-h3n2_group <- read.csv("/home/dulab/Documents/wrok/flu_paper/data/result_newest/cibersort/group_h3n21.csv",row.names = 1)
-ciber_fun(exp.file,h3n2_group,"all")
-
 ##############
+#############################
+exprs00_h3n2<-read.csv('/home/dulab/Documents/wrok/flu_paper/data/result_fi/h3n2_combat_data.csv',row.names = 1)  #87*8286
+exprs_h3n2 <- exprs00_h3n2
+write.table(exprs_h3n2,'h3n2_combat_data.txt',row.names = T,quote = F,sep = "\t")
 
-exp.file <- "h3n2_combat_train.txt"#h3n2_combat_data.txt
-h3n2_group <- read.csv("/home/dulab/Documents/wrok/flu_paper/data/result_newest/h3n2_group_train.csv",row.names = 1)
-ciber_fun(exp.file,h3n2_group,"train")
+exp.file <-"h3n2_combat_data.txt"
+h3n2_group <- read.csv("/home/dulab/Documents/wrok/flu_paper/data/result_fi/group_h3n2.csv",row.names = 1)
+ciber_fun(exp.file,h3n2_group,"all_combat1")
+setwd("/home/dulab/Documents/wrok/flu_paper/data/CODE_FI/ciber")  
+
+#################################################train
+
+exprs00_h3n2<-read.csv('/home/dulab/Documents/wrok/flu_paper/data/result_fi/h3n2_combat_data_train.csv',row.names = 1)  #87*8286
+
+exprs_h3n2 <- exprs00_h3n2
+write.table(exprs_h3n2,'exprs00_h3n2_train_combat.txt',row.names = T,quote = F,sep = "\t")
+
+exp.file <-"exprs00_h3n2_train_combat.txt"#h3n2_combat_data.txt
+h3n2_group <- read.csv("/home/dulab/Documents/wrok/flu_paper/data/result_fi/group_h3n2_train.csv",row.names = 1)
+ciber_fun(exp.file,h3n2_group,"train_combat1")
+
+############################BH
