@@ -1,20 +1,20 @@
 
 #======================================[ Differential expression analysis use the rankprod package ]==========================================
 library(RankProd)
-setwd("/home/dulab/Documents/wrok/flu_paper/data/result_newest/")  
+setwd("/home/dulab/Documents/wrok/flu_paper/data/result_fi/")  
+###############
 
-exprs_h3n2<-read.csv('exprs_train.csv',row.names = 1)
-h3n2_group <- read.csv("h3n2_group_train.csv",row.names = 1)
-
-
-exprs.gnames<-rownames(exprs_h3n2)
-h3n2_group<-h3n2_group[colnames(exprs_h3n2),]
+##################################3
+exprs_train<-read.csv('exprs00_h3n2_train.csv',row.names = 1)
+h3n2_group_train <- read.csv("group_h3n2_train.csv",row.names = 1)
+exprs.gnames<-rownames(exprs_train)
+h3n2_group<-h3n2_group_train[colnames(exprs_train),]
 
 exprs.cl <- as.numeric(as.factor(h3n2_group$group))
 exprs.cl[exprs.cl==1]<-0
 exprs.cl[exprs.cl==2]<-1
 
-RP.adv.out <- RP.advance(exprs_h3n2,exprs.cl,h3n2_group$batch, logged=TRUE,na.rm=FALSE,  gene.names=exprs.gnames,
+RP.adv.out <- RP.advance(exprs_train,exprs.cl,h3n2_group$batch, logged=TRUE,na.rm=FALSE,  gene.names=exprs.gnames,
                          plot = FALSE,rand = 123,MinNumOfValidPairs =1)     ###class1:asym,class2:sym
 
 degs<-topGene(RP.adv.out,cutoff = 0.05,method="pfp",logged=TRUE,logbase=2,gene.names=exprs.gnames) 
@@ -43,13 +43,13 @@ write.csv(geneFC,"gene_fc_train.csv",row.names = T)
   library(ggplot2)
   library(pheatmap)
   library(ComplexHeatmap)
-setwd("/home/dulab/Documents/wrok/flu_paper/data/result_newest/")  
+setwd("/home/dulab/Documents/wrok/flu_paper/data/result_fi")  
 
   
   up_deg<-read.csv('updeg_h3n2_train.csv',row.names = 1)  ##477
   down_deg<-read.csv('downdeg_h3n2_train.csv',row.names = 1)  ##273
   degs<-rbind(up_deg,down_deg)
-  exprs<-read.csv('exprs_train.csv',row.names = 1)  ##8286*72
+  exprs<-read.csv('exprs00_h3n2_train.csv',row.names = 1)  ##8286*72
   gene_pfp <- RP.adv.out$pfp
   gene_pfp<- as.data.frame(gene_pfp)
   gene_pfp$gene <- rownames(gene_pfp)
@@ -77,7 +77,7 @@ setwd("/home/dulab/Documents/wrok/flu_paper/data/result_newest/")
   tmp$aveFC <- as.numeric(tmp$aveFC)
   tmp<- merge(tmp,allgene,by=c("gene"))
   
-  ggplot()+geom_point(aes(x= tmp$aveFC,
+  pp<-ggplot()+geom_point(aes(x= tmp$aveFC,
                           y=-log10(tmp$pfp),color=tmp$type))+#,color=CB7vsCB13_select$State
     mytheme+geom_hline(aes(yintercept=-log10(0.05)),colour="#526373",linetype="dashed")+
     #geom_hline(aes(yintercept=-0.58),colour="#526373",linetype="dashed")+
@@ -85,4 +85,7 @@ setwd("/home/dulab/Documents/wrok/flu_paper/data/result_newest/")
     scale_color_manual(values=c("#085A9C","#526373","#EF0808"))+
     labs(x="Log2FoldChange",y="-Log10pfp",colour="",fill="") +ylim(0,20)+xlim(-1.2,1.2)
   
+  pdf("deg_volano_train.pdf",height=5,width=5)
+  print(pp)
+  dev.off()
   

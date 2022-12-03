@@ -2,12 +2,31 @@ rm(list=ls())
 gc()
 #======================================[ Differential expression analysis use the rankprod package ]==========================================
 library(RankProd)
-setwd("/home/dulab/Documents/wrok/flu_paper/data/result_newest/")  
+mytheme<-theme_bw()+theme(legend.position=c(0.8,0.8),#"right",
+                          #panel.border=element_blank(),
+                          panel.grid.major=element_blank(),
+                          panel.grid.minor=element_blank(),
+                          plot.title=element_text(size=16,
+                                                  colour="black",
+                          ), #family="CA"),
+                          axis.title =element_text(size=16,
+                                                   colour="black",
+                          ),#family="CA"),
+                          legend.text=element_text(size=16,colour="black",
+                          ),#family="CA"),
+                          legend.key=element_blank(),
+                          axis.text=element_text(size=16,colour="black",
+                          ),#family="CA"),
+                          strip.text=element_text(size=16,colour="#085A9C",
+                          ),#family="CA"),
+                          strip.background=element_blank())
+setwd("/home/dulab/Documents/wrok/flu_paper/data/result_fi/")  
 
-exprs_h3n2<-read.csv('h3n2_combat_data1.csv',row.names = 1)
-h3n2_group <- read.csv("group_h3n21.csv",row.names = 1)
+exprs_h3n2<-read.csv('exprs00_h3n2.csv',row.names = 1)
+h3n2_group <- read.csv("group_h3n2.csv",row.names = 1)
 
 exprs.gnames<-rownames(exprs_h3n2)
+#h3n2_group<- read.csv("h3n2_group_train.csv",row.names = 1)
 h3n2_group<-h3n2_group[colnames(exprs_h3n2),]
 
 exprs.cl <- as.numeric(as.factor(h3n2_group$group))
@@ -28,14 +47,12 @@ down<-down[!rownames(down)%in%commgene,]
 write.csv(up,'updeg_h3n2_all.csv')  
 write.csv(down,'downdeg_h3n2_all.csv')  
 
-#write.csv(up,'updeg_h3n2_all_nosex.csv')  
-#write.csv(down,'downdeg_h3n2_all_nosex.csv')  
+
 geneFC <- RP.adv.out$AveFC
 
 stable_gene <- data.frame(gene=setdiff(setdiff(exprs.gnames,rownames(up)),rownames(down)),type="unchanged")
 upgene <- data.frame(gene=setdiff(rownames(up),rownames(down)),type="up")
 downgene <- data.frame(gene=setdiff(rownames(down),rownames(up)),type="down")
-#stable_gene1 <- data.frame(gene=intersect(rownames(up),rownames(down)),type="unchanged")
 allgene <- rbind(upgene,downgene,stable_gene)
 
 colnames(geneFC)<-c("AveFC")
@@ -50,15 +67,16 @@ write.csv(geneFC,"gene_fc_all.csv",row.names = T)
   library(ggplot2)
   library(pheatmap)
   library(ComplexHeatmap)
-setwd("/home/dulab/Documents/wrok/flu_paper/data/result_newest/")  
+setwd("/home/dulab/Documents/wrok/flu_paper/data/result_fi/")  
 
   
-  up_deg<-read.csv('updeg_h3n2_all.csv',row.names = 1)  ##73
+  up_deg<-read.csv('updeg_h3n2_all.csv',row.names = 1)  ##Asym >sym
   down_deg<-read.csv('downdeg_h3n2_all.csv',row.names = 1)  ##202
   
   degs<-rbind(up_deg,down_deg)
-  exprs<-read.csv('h3n2_combat_data1.csv',row.names = 1)
+  exprs<-read.csv('exprs00_h3n2.csv',row.names = 1)
 
+  
   gene_pfp <- RP.adv.out$pfp
   gene_pfp<- as.data.frame(gene_pfp)
   gene_pfp$gene <- rownames(gene_pfp)
@@ -67,8 +85,7 @@ setwd("/home/dulab/Documents/wrok/flu_paper/data/result_newest/")
   gene_pval$gene <- rownames(gene_pval)
   
   geneFC <- read.csv("gene_fc_all.csv",header = T)
-  #geneFC <- read.csv("gene_fc_all_nosex.csv",header = T)
-  
+
   colnames(geneFC)<- c("gene","aveFC")
   
   alldata <- cbind(gene_pfp,gene_pval,geneFC)
@@ -87,18 +104,26 @@ setwd("/home/dulab/Documents/wrok/flu_paper/data/result_newest/")
   tmp$pval <- as.numeric(tmp$pval)
   tmp$aveFC <- as.numeric(tmp$aveFC)
   tmp<- merge(tmp,allgene,by=c("gene"))
+ pp<- ggplot()+geom_point(aes(x= tmp$aveFC,
+                          y=-log10(tmp$pval),color=tmp$type))+#,color=CB7vsCB13_select$State
+    mytheme+geom_hline(aes(yintercept=-log10(0.05)),colour="#526373",linetype="dashed")+
+    #geom_hline(aes(yintercept=-0.58),colour="#526373",linetype="dashed")+
+    geom_vline(aes(xintercept=0),colour="#526373",linetype="dashed")+
+    scale_color_manual(values=c("#085A9C","#526373","#EF0808"))+
+    labs(x="Log2FoldChange",y="-Log10Pvale",colour="",fill="")+ylim(0,20)
+  pdf("deg_volano_all1.pdf",height=5,width=5)
+  print(pp)
+  dev.off()
   
-  
-  ggplot()+geom_point(aes(x= tmp$aveFC,
+  pp<-ggplot()+geom_point(aes(x= tmp$aveFC,
                           y=-log10(tmp$pfp),color=tmp$type))+#,color=CB7vsCB13_select$State
     mytheme+geom_hline(aes(yintercept=-log10(0.05)),colour="#526373",linetype="dashed")+
     #geom_hline(aes(yintercept=-0.58),colour="#526373",linetype="dashed")+
     geom_vline(aes(xintercept=0),colour="#526373",linetype="dashed")+
     scale_color_manual(values=c("#085A9C","#526373","#EF0808"))+
     labs(x="Log2FoldChange",y="-Log10pfp",colour="",fill="") +ylim(0,20)+xlim(-1.2,1.2)
-  
+  pdf("deg_volano_all.pdf",height=5,width=5)
+  print(pp)
+  dev.off()
 
   
-  
-  
- 

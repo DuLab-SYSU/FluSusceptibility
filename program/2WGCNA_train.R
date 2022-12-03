@@ -2,7 +2,7 @@
 rm(list=ls())
 gc()
 options(stringsAsFactors = FALSE)
-setwd("/home/dulab/Documents/wrok/flu_paper/data/result_newest/")  
+setwd("/home/dulab/Documents/wrok/flu_paper/data/result_fi/")  
 #===================================[ load pkg and data ]======================================
 
   library(WGCNA)
@@ -30,19 +30,23 @@ mytheme<-theme_bw()+theme(legend.position="right",
                           ),#family="CA"),
                           strip.background=element_blank())
   ###all data
-  exprs_h3n2<-read.csv('exprs_train.csv',row.names = 1)
-  h3n2_group <- read.csv("h3n2_group_train.csv",row.names = 1)
+ 
+  
+  exprs_h3n2<-read.csv('h3n2_combat_data_train.csv',row.names = 1)
+  h3n2_group <- read.csv("group_h3n2_train.csv",row.names = 1)
+  
+  #exprs_h3n2<-read.csv('exprs_train.csv',row.names = 1)
+  #h3n2_group <- read.csv("group_h3n2_train.csv",row.names = 1)
 #==========================================[ data prepare ]===========================================
 
   #use the top sd gene 
   exprs<-apply(exprs_h3n2,1,var)
-  #exprs<-as.data.frame(t(exprs_h3n2[which(exprs>quantile(exprs, probs = seq(0, 1, 0.25))[4]),]))  ##2027*62
   exprs<-as.data.frame(t(exprs_h3n2[which(exprs>quantile(exprs, probs = seq(0, 1, 0.2))[5]),]))  ##1657*62
   
   
   
   #check the outlier sample
-  Traits <- subset(h3n2_group,select=c("subject","group"))
+  Traits <- subset(h3n2_group,select=c("gseID","group"))
   Traits<- Traits[rownames(exprs),]
   #  Traits<- data.frame(sample=rownames(exprs),type=h3n2_group)
   sampletree<-hclust(dist(exprs),method = 'average')
@@ -77,39 +81,40 @@ mytheme<-theme_bw()+theme(legend.position="right",
   
   ####One-step building blocks:14 modules
     cor <- WGCNA::cor
-    net = blockwiseModules(exprs, power =sft$powerEstimate,maxBlockSize = 6000, TOMType = "unsigned", minModuleSize = 15,reassignThreshold = 0, 
+    #net = blockwiseModules(exprs, power =sft$powerEstimate,maxBlockSize = 5000, TOMType = "unsigned", minModuleSize = 15,reassignThreshold = 0, 
+    #                       mergeCutHeight = 0.2,numericLabels = TRUE, pamRespectsDendro = FALSE,saveTOMs = TRUE,
+    #                       saveTOMFileBase = "TOM",verbose = 5,deepSplit = 4)#sft$powerEstimate 
+    net = blockwiseModules(exprs, power =sft$powerEstimate,
+                           maxBlockSize = 6000, TOMType = "unsigned", minModuleSize = 15,reassignThreshold = 0, 
                            mergeCutHeight = 0.25,numericLabels = TRUE, pamRespectsDendro = FALSE,saveTOMs = TRUE,
-                           saveTOMFileBase = "TOM",verbose = 3)#sft$powerEstimate 
+                           saveTOMFileBase = "TOM",verbose = 5,deepSplit = 2)#sft$powerEstimate 
+    
     table(net$colors) ##minModuleSize=20:12;15:16
     cor<-stats::cor
     mergedColors = labels2colors(net$colors)
     write.csv(table(mergedColors),'mergedColorstrain.csv')
     number_module <- data.frame(module=names(table(mergedColors)),number=table(mergedColors))
-    number_module$module_color <- c("black", "#0080FFFF","#7C3F07","cyan",
+    number_module$module_color <- sort(unique(mergedColors[net$blockGenes[[1]]]))
+      c("black", "#0080FFFF","#7C3F07","cyan",
                                     "green","#A0D600" ,"grey","grey60","lightcyan"
-                                   # ,"lightgreen"
-                                    ,#"lightyellow",
-                                    "#FF80FFFF","midnightblue","pink","purple",
+                                   #,"lightgreen","#FDE725FF"
+                                   # ,"lightyellow"
+                                   , "#FF80FFFF","midnightblue","pink","purple",
                                     "firebrick","#FF8B8B","tan",
                                     "#1B9E77","#FFFF00FF")
-                                    #,"#B6CCD7","#F6EDEF","#287C8EFF","#8BD646FF")#,"#FDE725FF"
+                                    #,"#B6CCD7","#F6EDEF","#287C8EFF","#8BD646FF")#
     
-    ggplot(number_module,aes(x=module,y=number.Freq,fill=module))+geom_bar(stat = "identity",width = 0.8
+   pp<- ggplot(number_module,aes(x=module,y=number.Freq,fill=module))+geom_bar(stat = "identity",width = 0.8
                                                                            , alpha = 0.8)+
       scale_fill_manual(values = number_module$module_color)+mytheme+
       geom_text(aes(label = number.Freq),color="white", position = position_dodge(0.2))+
       theme(axis.text.x=element_text(size=12,angle = 90)) 
-    
+    pdf("module_number_train",height=4,width=9)
+    print(pp)
+    dev.off()
     
     gene_color <-mergedColors[net$blockGenes[[1]]]
-    gene_color<-gsub("^blue","#0080FFFF",gene_color)
-    gene_color<-gsub("brown","#7C3F07",gene_color)
-    gene_color<-gsub("greenyellow","#A0D600",gene_color)
-    gene_color<-gsub("magenta","#FF80FFFF",gene_color)
-    gene_color<-gsub("red","firebrick",gene_color)
-    gene_color<-gsub("salmon","#FF8B8B",gene_color)
-    gene_color<-gsub("turquoise","#1B9E77",gene_color)
-    gene_color<-gsub("^yellow","#FFFF00FF",gene_color)
+    
     
     plotDendroAndColors(net$dendrograms[[1]], gene_color,"Module colors",
                         dendroLabels = FALSE, hang = 0.03,addGuide = TRUE, guideHang = 0.05)
@@ -129,7 +134,7 @@ mytheme<-theme_bw()+theme(legend.position="right",
   ##The first principal component of each module
   MEs0 = moduleEigengenes(exprs, moduleColors)$eigengenes
   MEs=orderMEs(MEs0)
-  moduleTraitCor = cor(MEs, design,use = "p")
+  moduleTraitCor = cor(MEs, design,use = "p",method = "spearman")
   moduleTraitCor1<-moduleTraitCor[order(moduleTraitCor[,"sym"],decreasing = TRUE),]
   moduleTraitPvalue = corPvalueStudent(moduleTraitCor1, nSamples)
   textMatrix = paste(signif(moduleTraitCor1, 2), "\n(",signif(moduleTraitPvalue, 2), ")", sep = "")
@@ -183,14 +188,14 @@ mytheme<-theme_bw()+theme(legend.position="right",
   pp<-pp[order(pp$asym),]
   anno_row <- data.frame("Module"=rownames(moduleTraitCor1))
   rownames(anno_row)<-rownames(pp)
-  ann_colors <- list(Module=c(MEbrown="#7C3F07",MEmagenta="#FF80FFFF",MEyellow="#FFFF00FF",
-                              MEblue="#0080FFFF",MEblack="black",MEpurple="purple",MEcyan="cyan",
-                              MEmidnightblue="midnightblue",MEgrey60="grey60",MElightgreen="lightgreen",
-                              MElightcyan="lightcyan",MElightyellow="lightyellow",
-                              MEred="firebrick",MEgreen="green" ,MElightcyan="#e2fcfb",
-                              MEgrey="grey",MEpink= "pink", MEturquoise="#1B9E77",
-                              MEtan="tan",MEsalmon="#FF8B8B",MEgreenyellow="#A0D600"))
-  pheatmap(pp,cluster_rows=F,cluster_cols=F,
+  ann_colors <- list(Module=c(MEbrown="brown",MEmagenta="magenta",MEyellow="yellow",
+                              MEblue="blue",MEblack="black",MEpurple="purple",MEcyan="cyan",
+                              MEgreenyellow='greenyellow',
+                              MEmidnightblue="midnightblue",MEgrey60="grey60",
+                              MEred="red",MEgreen="green" ,MElightcyan="lightcyan",
+                              MEgrey="grey",MEpink= "pink", MEturquoise="turquoise",
+                              MEtan="tan",MEsalmon="salmon"))
+  pheatmap(as.matrix(pp),cluster_rows=F,cluster_cols=F,
            display_numbers=T,number_format="%.2f",
            border="white",
            fontsize_number=8,
@@ -212,15 +217,15 @@ mytheme<-theme_bw()+theme(legend.position="right",
   par(cex = 1)
   plotEigengeneNetworks(MET, '', marDendro = c(0,4,1,6), marHeatmap = c(5,6,2,1), cex.lab = 1.2, xLabelsAngle  = 90)
 
-  cell_type <- read.table("/home/dulab/Documents/wrok/flu_paper/data/result_newest/cibersort/TME.results.output_train.txt",header = T
+  cell_type <- read.table("/home/dulab/Documents/wrok/flu_paper/data/CODE_FI/ciber/TME.results.output_train.txt",header = T
                           ,row.names = 1,sep ="\t" )
-  cell_type <- cell_type[,-c(17,18)]
-  cell_type<-cell_type[,c(1,16)]#4,
+ # cell_type <- cell_type[,-c(17,18)]
+  cell_type<-cell_type[,c(1,10,18,8)]#4,
   cell_type <- cbind(design,cell_type)
   ##The first principal component of each module
   MEs0 = moduleEigengenes(exprs, moduleColors)$eigengenes
   MEs=orderMEs(MEs0)
-  moduleTraitCor = cor(MEs, cell_type,use = "p")
+  moduleTraitCor = cor(MEs, cell_type,use = "p",method = "spearman")
   moduleTraitCor1<-moduleTraitCor[order(moduleTraitCor[,"sym"],decreasing = TRUE),]#B.cells.naive
   moduleTraitPvalue = corPvalueStudent(moduleTraitCor1, nSamples)
   textMatrix = paste(signif(moduleTraitCor1, 2), "\n(",signif(moduleTraitPvalue, 2), ")", sep = "")
@@ -248,13 +253,7 @@ mytheme<-theme_bw()+theme(legend.position="right",
   pp<-pp[order(pp$asym),]
   anno_row <- data.frame("Module"=rownames(moduleTraitCor1))
   rownames(anno_row)<-rownames(pp)
-  ann_colors <- list(Module=c(MEbrown="#7C3F07",MEmagenta="#FF80FFFF",MEyellow="#FFFF00FF",
-                              MEblue="#0080FFFF",MEblack="black",MEpurple="purple",MEcyan="cyan",
-                              MEmidnightblue="midnightblue",MEgrey60="grey60",MElightgreen="lightgreen",
-                              MElightcyan="lightcyan",MElightyellow="lightyellow",
-                              MEred="firebrick",MEgreen="green" ,MElightcyan="#e2fcfb",
-                              MEgrey="grey",MEpink= "pink", MEturquoise="#1B9E77",
-                              MEtan="tan",MEsalmon="#FF8B8B",MEgreenyellow="#A0D600"))
+
   pheatmap(pp,cluster_rows=F,cluster_cols=F,
            display_numbers=T,number_format="%.2f",
            border="white",

@@ -24,19 +24,21 @@ mytheme<-theme_bw()+theme(legend.position="right",
                           strip.text=element_text(size=16,colour="#085A9C",
                           ),#family="CA"),
                           strip.background=element_blank())
-setwd("/home/dulab/Documents/wrok/flu_paper/data/result_newest/")  
+setwd("/home/dulab/Documents/wrok/flu_paper/data/result_fi/")  
 
 ###all data
-exprs<-read.csv('h3n2_combat_data1.csv',row.names = 1)
-h3n2_group <- read.csv("group_h3n21.csv",row.names = 1)
+exprs<-read.csv('h3n2_combat_data.csv',row.names = 1)
+h3n2_group <- read.csv("group_h3n2.csv",row.names = 1)
 #exprs<-exprs[!(rownames(exprs)%in%c("EIF1AY","KDM5D","DDX3Y","PRS4Y1","PRKY")),]
 
+#exprs_train<-read.csv('exprs00_h3n2_train.csv',row.names = 1)
+#h3n2_group_train <- read.csv("group_h3n2_train.csv",row.names = 1)
 
 ###############
 h3n2_group_train<-subset(h3n2_group,!(batch=="GSE61754"))#32, #38
-exprs_train <- exprs[,h3n2_group_train$subject]
+exprs_train <- exprs[,h3n2_group_train$gseID]
 
-h3n2_group_train$subject <- factor(h3n2_group_train$subject,levels = colnames(exprs_train))
+h3n2_group_train$gseID <- factor(h3n2_group_train$gseID,levels = colnames(exprs_train))
 group_train <-h3n2_group_train[colnames(exprs_train),]
 group_train<-as.numeric(factor(group_train$group))
 group_train[group_train==1]<-0
@@ -49,25 +51,32 @@ write.csv(group_train,"group_train.csv")
 write.csv(h3n2_group_train,"h3n2_group_train.csv")
 
 h3n2_group_test<-subset(h3n2_group,batch=="GSE61754")#11, #14
-exprs_test <- exprs[,h3n2_group_test$subject]
+exprs_test <- exprs[,h3n2_group_test$gseID]
 
-h3n2_group_test$subject <- factor(h3n2_group_test$subject,levels = colnames(exprs_test))
-group_test <-h3n2_group_test[colnames(exprs_test),]
+#exprs_test<-read.csv('gse61754_sym_exprs',row.names = 1)#11, #14
+#h3n2_group_test <- subset(h3n2_group,batch=="GSE61754")
+
+h3n2_group_test$gseID <- factor(h3n2_group_test$gseID,levels = colnames(exprs_test)[-12])
+group_test <-h3n2_group_test[colnames(exprs_test)[-12],]
 group_test<-as.numeric(factor(group_test$group))
 group_test[group_test==1]<-0
 group_test[group_test==2]<-1
 #1 0 0 0 1 1 1 1 0 1 0 1 1 0 0 0 0
-write.csv(exprs_test,"exprs_test.csv")
+write.csv(exprs_test[,-12],"exprs_test.csv")
 write.csv(group_test,"group_test.csv")
 write.csv(h3n2_group_test,"h3n2_group_test.csv")
 
 
 ##########all 87 data set 
-h3n2_group$subject <- factor(h3n2_group$subject,levels = colnames(exprs))
+h3n2_group$gseID <- factor(h3n2_group$gseID,levels = colnames(exprs))
 group_all <-h3n2_group[colnames(exprs),]
 group_all<-as.numeric(factor(group_all$group))
 group_all[group_all==1]<-0
 group_all[group_all==2]<-1
+
+
+#sym_group <- h3n2_group[h3n2_group$group=="Symptomatic",]
+#asym_group <- h3n2_group[h3n2_group$group=="Asymptomatic",]
 
 ###############extract deg
 updegs<-read.csv('updeg_h3n2_all.csv',row.names = 1)  ##477
@@ -81,23 +90,23 @@ deg_expression <- exprs[rownames(degs),]
 write.csv(deg_expression,"deg_expression_all.csv")
 
 ##################extract the expression of gene in the co-expression modules
-#lightgreen<-read.csv('lightgreengenes_all.csv',row.names = 1)
-#lightcyan<-read.csv('lightcyangenes_all.csv',row.names = 1)
-cyangenes<-read.csv('cyangenes_all.csv',row.names = 1)
+lightgreen<-read.csv('lightgreengenes_all.csv',row.names = 1)
+lightcyan<-read.csv('lightcyangenes_all.csv',row.names = 1)
+#cyangenes<-read.csv('cyangenes_all.csv',row.names = 1)
 #bluegenes <- read.csv("bluegenes_all.csv",row.names = 1)
-#purplegenes <- read.csv("purplegenes_all.csv",row.names = 1)
+purplegenes <- read.csv("purplegenes_all.csv",row.names = 1)
 #salmongenes <- read.csv("salmongenes_all.csv",row.names = 1)
 #greenyellowgenes <- read.csv("greenyellowgenes_all.csv",row.names = 1)
 #magentagenes <- read.csv("magentagenes_all.csv",row.names = 1)
-browngenes <- read.csv("browngenes_all.csv",row.names = 1)
+#browngenes <- read.csv("browngenes_all.csv",row.names = 1)
 #yellowgenes <- read.csv("yellowgenes_all.csv",row.names = 1)
 
 #greengenes <- read.csv("greengenes.csv",row.names = 1)
 #midnightbluegenes <- read.csv("midnightbluegenes.csv",row.names = 1)
 
 #redgenes <- read.csv("redgenes.csv",row.names = 1)
-tangenes <- read.csv("tangenes_all.csv",row.names = 1)
-#blackgenes <- read.csv("blackgenes.csv",row.names = 1)
+#tangenes <- read.csv("tangenes_all.csv",row.names = 1)
+blackgenes <- read.csv("blackgenes_all.csv",row.names = 1)
 #pinkgenes <- read.csv("pinkgenes.csv",row.names = 1)
 #turquoisegenes <- read.csv("turquoisegenes.csv",row.names = 1)
 #greygenes <- read.csv("greygenes.csv",row.names = 1)
@@ -110,20 +119,21 @@ expression_fun <- function(x,module_name){
   write.csv(x,paste(module_name,"_expression_all.csv"),row.names = T)
   return(x)}
 
-#lightgreengenes<-expression_fun(lightgreen,"MELightgreen")
+lightgreengenes<-expression_fun(lightgreen,"MELightgreen")
+lightcyangenes<-expression_fun(lightcyan,"MELightcyan")
 #bluegenes<-expression_fun(bluegenes,"MEBlue")
 
-#purplegenes <- expression_fun(purplegenes,"MEPurple")
+purplegenes <- expression_fun(purplegenes,"MEPurple")
 #salmongenes <- expression_fun(salmongenes,"MESalmon")
 #greenyellowgenes <- expression_fun(greenyellowgenes,"MEGreenyellow")
 #magentagenes <- expression_fun(magentagenes,"MEMagenta")
-browngenes <- expression_fun(browngenes,"MEbrown")
+#browngenes <- expression_fun(browngenes,"MEbrown")
 #yellowgenes <- expression_fun(yellowgenes,"MEYellow")
 #greengenes <- expression_fun(greengenes,"MEGreen")
 #midnightbluegenes <- expression_fun(midnightbluegenes,"MEMidnightblue")
 #redgenes <- expression_fun(redgenes,"MERed")
-tangenes <- expression_fun(tangenes,"MEtan")
-cyangenes <- expression_fun(cyangenes,"MEcyan")
+#tangenes <- expression_fun(tangenes,"MEtan")
+#cyangenes <- expression_fun(cyangenes,"MEcyan")
 
 #blackgenes <- expression_fun(blackgenes,"MEBlack")
 #pinkgenes <- expression_fun(pinkgenes,"MEPink")
@@ -133,24 +143,33 @@ cyangenes <- expression_fun(cyangenes,"MEcyan")
 
 #trait_module <- rbind(magentagenes,salmongenes,lightgreengenes)#yellowgenes,
 #trait_module <- rbind(browngenes,bluegenes,yellowgenes,tangenes,salmongenes,greenyellowgenes)
-trait_module <- rbind(browngenes,tangenes,cyangenes)#yellowgenes,
+#trait_module <- rbind(browngenes,tangenes,cyangenes)#yellowgenes,
+#trait_module <- rbind(lightgreengenes,lightcyangenes,purplegenes,blackgenes)#yellowgenes,
 
-write.csv(trait_module,"trait_module_all.csv",row.names = T)
+#write.csv(trait_module,"trait_module_all.csv",row.names = T)
 
-################################################
-module_gene <-read.csv("trait_module_all.csv",row.names = 1)
+trait_module <- rbind(lightgreengenes,lightcyangenes,purplegenes)#yellowgenes,
+
+write.csv(trait_module,"trait_module_all_noblack.csv",row.names = T)
+
+
+#dm_inter_sym <- dm_inter[,sym_group$gseID]
+#dm_inter_asym <- dm_inter[,asym_group$gseID]
+#write.csv(dm_inter_sym,"dm_inter_sym_all.csv",row.names = T)
+#write.csv(dm_inter_asym,"dm_inter_asym_all.csv",row.names = T)
+
+module_gene <-read.csv("trait_module_all_noblack.csv",row.names = 1)
 dm_intersection <- intersect(rownames(degs),rownames(module_gene))
 dm_merge <- unique(union(rownames(degs),rownames(module_gene)))
 
 dm_inter <- exprs[dm_intersection,]
 dm_me <- exprs[dm_merge,]
 
-write.csv(dm_inter,"dm_inter_all.csv",row.names = T)
-write.csv(dm_me,"dm_me_all.csv",row.names = T)
+write.csv(dm_inter,"dm_inter_all_noblack.csv",row.names = T)
+write.csv(dm_me,"dm_me_all_noblack.csv",row.names = T)
 
 dm_model<-module_gene[dm_intersection,][,c(1,2)]
-write.csv(dm_model,"dm_inter_gene_module_all.csv",row.names = T)
-
+write.csv(dm_model,"dm_inter_gene_module_all_noblack.csv",row.names = T)
 
 
 ############################################################4 dataset 
@@ -168,187 +187,98 @@ deg_expression <- exprs[rownames(degs),]
 write.csv(deg_expression,"deg_expression_train.csv")
 ##################extract the expression of gene in the co-expression modules
 
-#cyangenes <- read.csv("cyangenes_train.csv",row.names = 1)
-#bluegenes <- read.csv("bluegenes_train.csv",row.names = 1)
+cyangenes <- read.csv("cyangenes_train.csv",row.names = 1)
+bluegenes <- read.csv("bluegenes_train.csv",row.names = 1)
 #purplegenes <- read.csv("purplegenes_train.csv",row.names = 1)
 #salmongenes <- read.csv("salmongenes_train.csv",row.names = 1)
-#greenyellowgenes <- read.csv("greenyellowgenes_train.csv",row.names = 1)
-magentagenes <- read.csv("magentagenes_train.csv",row.names = 1)
+greenyellowgenes <- read.csv("greenyellowgenes_train.csv",row.names = 1)
+#magentagenes <- read.csv("magentagenes_train.csv",row.names = 1)
 #browngenes <- read.csv("browngenes.csv",row.names = 1)
 #yellowgenes <- read.csv("yellowgenes_train.csv",row.names = 1)
 
-greengenes <- read.csv("greengenes_train.csv",row.names = 1)
+#greengenes <- read.csv("greengenes_train.csv",row.names = 1)
 midnightbluegenes <- read.csv("midnightbluegenes_train.csv",row.names = 1)
 
 #redgenes <- read.csv("redgenes_train.csv",row.names = 1)
-tangenes <- read.csv("tangenes_train.csv",row.names = 1)
-blackgenes <- read.csv("blackgenes_train.csv",row.names = 1)
+#tangenes <- read.csv("tangenes_train.csv",row.names = 1)
+#blackgenes <- read.csv("blackgenes_train.csv",row.names = 1)
 #pinkgenes <- read.csv("pinkgenes.csv",row.names = 1)
 #turquoisegenes <- read.csv("turquoisegenes_train.csv",row.names = 1)
 #greygenes <- read.csv("greygenes.csv",row.names = 1)
+grey60genes <- read.csv("grey60genes_train.csv",row.names = 1)
 
 expression_fun <- function(x,module_name){
   colnames(x)<- c("gene")
+  rownames(x) <-x$gene
   x$modeuleType <-module_name
+  x<- x[intersect(x$gene,rownames(exprs)),]
   x<- cbind(x,exprs[rownames(exprs) %in% x$gene,])
   rownames(x)<-x$gene
   write.csv(x,paste(module_name,"_expression_train.csv"),row.names = T)
   return(x)}
 
-#cyangenes<-expression_fun(cyangenes,"MECyan")
-#bluegenes<-expression_fun(bluegenes,"MEBlue")
+cyangenes<-expression_fun(cyangenes,"MECyan")
+bluegenes<-expression_fun(bluegenes,"MEBlue")
 
 #purplegenes <- expression_fun(purplegenes,"MEPurple")
 #salmongenes <- expression_fun(salmongenes,"MESalmon")
-#greenyellowgenes <- expression_fun(greenyellowgenes,"MEGreenyellow")
-magentagenes <- expression_fun(magentagenes,"MEMagenta")
+greenyellowgenes <- expression_fun(greenyellowgenes,"MEGreenyellow")
+#magentagenes <- expression_fun(magentagenes,"MEMagenta")
 #browngenes <- expression_fun(browngenes,"MEBrown")
 #yellowgenes <- expression_fun(yellowgenes,"MEYellow")
-greengenes <- expression_fun(greengenes,"MEGreen")
+#greengenes <- expression_fun(greengenes,"MEGreen")
 midnightbluegenes <- expression_fun(midnightbluegenes,"MEMidnightblue")
 #redgenes <- expression_fun(redgenes,"MERed")
-tangenes <- expression_fun(tangenes,"METan")
+#tangenes <- expression_fun(tangenes,"METan")
 
-blackgenes <- expression_fun(blackgenes,"MEBlack")
+#blackgenes <- expression_fun(blackgenes,"MEBlack")
 #pinkgenes <- expression_fun(pinkgenes,"MEPink")
 #turquoisegenes <- expression_fun(turquoisegenes,"METurquoise")
 #greygenes <- expression_fun(greygenes,"MEGrey")
+grey60genes <- expression_fun(grey60genes,"MEGrey60")
 
 
-trait_module <- rbind(magentagenes,tangenes)
+trait_module <- rbind(cyangenes,bluegenes,greenyellowgenes,midnightbluegenes,grey60genes)
 
 write.csv(trait_module,"trait_module_train.csv",row.names = T)
 
-trait_module1 <-rbind(magentagenes,greengenes,blackgenes,midnightbluegenes,tangenes)
-write.csv(trait_module1,"most_revelent_train.csv",row.names = T)
-
-
-expression_fun1 <- function(x,module_name){
-  colnames(x)<- c("gene")
-  x$modeuleType <-module_name
-  x<- cbind(x,exprs1[rownames(exprs1) %in% x$gene,])
-  rownames(x)<-x$gene
-  write.csv(x,paste(module_name,"_expression_test.csv"),row.names = T)
-  return(x)}
-#cyangenes<-expression_fun1(cyangenes,"MECyan")
-tangenes<-expression_fun1(tangenes,"MEtan")
-
-#greenyellowgenes <- expression_fun1(greenyellowgenes,"MEGreenyellow")
-greengenes <- expression_fun1(greengenes,"MEGreen")
-
-magentagenes <- expression_fun1(magentagenes,"MEMagenta")
-#redgenes <- expression_fun1(redgenes,"MERed")
-midnightbluegenes <- expression_fun1(midnightbluegenes,"MEMidnightblue")
-blackgenes <- expression_fun1(blackgenes,"MEBlack")
-trait_module2 <-rbind(magentagenes,greengenes,blackgenes,midnightbluegenes,tangenes)
-
-write.csv(trait_module2,"most_revelent_test.csv",row.names = T)
+#trait_module1 <-rbind(magentagenes,greengenes,blackgenes,midnightbluegenes,tangenes)
+#write.csv(trait_module1,"most_revelent_train.csv",row.names = T)
 
 ################################################
 module_gene <-read.csv("trait_module_train.csv",row.names = 1)
 dm_intersection <- intersect(rownames(degs),rownames(module_gene))
 dm_merge <- unique(union(rownames(degs),rownames(module_gene)))
 
-dm_inter <- exprs[dm_intersection,]
-dm_me <- exprs[dm_merge,]
+#dm_inter <- exprs[dm_intersection,]
+#dm_me <- exprs[dm_merge,]
 
-write.csv(dm_inter,"dm_inter_train.csv",row.names = T)
-write.csv(dm_me,"dm_me_train.csv",row.names = T)
+#write.csv(na.omit(dm_inter),"dm_inter_train.csv",row.names = T)
+#write.csv(dm_me,"dm_me_train.csv",row.names = T)
+##################train1111
 
-dm_inter <- exprs1[dm_intersection,]
-dm_me <- exprs1[dm_merge,]
-
-write.csv(dm_inter,"dm_inter_test.csv",row.names = T)
-write.csv(dm_me,"dm_me_test.csv",row.names = T)
-
-dm_model<-module_gene[dm_intersection,][,c(1,2)]
-write.csv(dm_model,"dm_inter_gene_module_train.csv",row.names = T)
-
-
-##############
-module_gene <-read.csv("most_revelent_train.csv",row.names = 1)
+###################################################
+#dm_intersection1 <- intersect(rownames(exprs1),dm_intersection)#TXNDC5 TXNDC5    MEGrey60
+#dm_intersection2<- setdiff(dm_intersection1,"TXNDC5")
+module_gene <-read.csv("trait_module_train.csv",row.names = 1)
 dm_intersection <- intersect(rownames(degs),rownames(module_gene))
 dm_merge <- unique(union(rownames(degs),rownames(module_gene)))
+dm_inter <- exprs1[dm_intersection,]
+dm_me <- exprs1[dm_merge,]
+
+write.csv(dm_inter,"dm_inter_test1113.csv",row.names = T)
+write.csv(dm_me,"dm_me_test1113.csv",row.names = T)
+
 
 dm_inter <- exprs[dm_intersection,]
 dm_me <- exprs[dm_merge,]
 
-write.csv(dm_inter,"dm_inter_train_most.csv",row.names = T)
-write.csv(dm_me,"dm_me_train_most.csv",row.names = T)
 
-dm_inter <- exprs1[dm_intersection,]
-dm_me <- exprs1[dm_merge,]
+write.csv(na.omit(dm_inter),"dm_inter_train1113.csv",row.names = T)
+write.csv(dm_me,"dm_me_train1113.csv",row.names = T)
 
-write.csv(dm_inter,"dm_inter_test_most.csv",row.names = T)
-write.csv(dm_me,"dm_me_test_most.csv",row.names = T)
 
 dm_model<-module_gene[dm_intersection,][,c(1,2)]
-write.csv(dm_model,"dm_inter_gene_module_train_most.csv",row.names = T)
-###################module compare between all and train
-library(pheatmap)
+write.csv(dm_model,"dm_inter_gene_module_train1113.csv",row.names = T)
 
-module_gene_all <- read.csv("dm_inter_gene_module_all.csv",row.names = 1)
-module_gene_train <- read.csv("dm_inter_gene_module_train.csv",row.names = 1)
-df_all<-data.frame(number=numeric(),len_all=numeric(),len_train=numeric(),len_union=numeric()
-                   ,type=character())
-for (i in unique(module_gene_all$modeuleType)){
-  for (j in unique(module_gene_train$modeuleType)){
-    tmp1 <- subset(module_gene_all,modeuleType==i)
-    tmp2<- subset(module_gene_train,modeuleType==j)
-    
-    df=data.frame(number=length(intersect(tmp1$gene,tmp2$gene)),len_all=nrow(tmp1),len_train=nrow(tmp2),len_union=length(union(tmp1$gene,tmp2$gene))
-                  ,type=paste(i,j,sep = '_'))
-    df_all<-rbind(df_all,df)
-  }
-}
-df_all<-na.omit(df_all)
-df_all$dis <- df_all$number/df_all$len_union
-
-module_gene_train <- read.csv("dm_inter_gene_module_train_most.csv",row.names = 1)
-df_all1<-data.frame(number=numeric(),len_all=numeric(),len_train=numeric(),len_union=numeric()
-                    ,type=character())
-for (i in unique(module_gene_all$modeuleType)){
-  for (j in unique(module_gene_train$modeuleType)){
-    tmp1 <- subset(module_gene_all,modeuleType==i)
-    tmp2<- subset(module_gene_train,modeuleType==j)
-    df=data.frame(number=length(intersect(tmp1$gene,tmp2$gene)),len_all=nrow(tmp1),len_train=nrow(tmp2),len_union=length(union(tmp1$gene,tmp2$gene))
-                  ,type=paste(i,j,sep = '_'))
-    df_all1<-rbind(df_all1,df)
-  }
-}
-df_all<-na.omit(df_all)
-df_all1$dis <- df_all1$number/df_all1$len_union
-
-sim_df <- data.frame(matrix(df_all1$dis,nrow = 5))
-colnames(sim_df)<-c("MEbrown","MEtan","MEcyan")
-rownames(sim_df)<-c("MEmagenta","MEmidnightblue","MEblack","MEgreen","MEtan")
-
-anno_row <- data.frame("Module_train"=rownames(sim_df))
-rownames(anno_row)<-rownames(sim_df)
-
-anno_col <- data.frame("Module_all"=colnames(sim_df))
-rownames(anno_col)<-colnames(sim_df)
-
-
-ann_colors <- list(Module_all=c(MEbrown="#7C3F07",MEmagenta="#FF80FFFF",
-                                MEblack="black",MEcyan="cyan",
-                                MEmidnightblue="midnightblue",MEgreen="green" ,
-                                MEtan="tan"))
-
-pheatmap(sim_df,cluster_rows=F,cluster_cols=F,
-         display_numbers=T,number_format="%.2f",
-         border="white",
-         #scale="row",
-         fontsize_number=8,
-         fontsize_col = 8,
-         fontsize_row = 8,
-         #angle_col = 90,
-         legend_breaks=c(-0.35,-0.2,0,0.2,0.35),
-         legend_labels=c("-0.35","-0.2","0","0.2","0.35"),
-         #color = mycol,
-         fontsize=8,
-         annotation_row=anno_row,
-         annotation_col=anno_col,
-         annotation_colors=ann_colors
-)
 

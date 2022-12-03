@@ -206,14 +206,14 @@ term_lengthfun <- function(term,k=50){
 #=============================[ setting default and load data ]==================================
 
 ##degs
-setwd("/home/dulab/Documents/wrok/flu_paper/data/result_newest/")  
+setwd("/home/dulab/Documents/wrok/flu_paper/data/result_fi/")  
 #setwd("~/result1/1deg/")
 path1<-getwd()
 gene_up<-read.csv('updeg_h3n2_train.csv',row.names = 1)  ##478
 gene_down<-read.csv('downdeg_h3n2_train.csv',row.names = 1)  ##267
-backgene<-read.csv('exprs_train.csv',row.names = 1)   #72*8286
-pic1<-'up_dataset4'
-pic2<-'down_dataset4'
+backgene<-read.csv('exprs00_h3n2_train.csv',row.names = 1)   #72*8286
+pic1<-'up_train'
+pic2<-'down_train'
 
 
 
@@ -222,32 +222,32 @@ pic2<-'down_dataset4'
 {
   ##rankprod up
   allgofun(gene_up,backgene,pic1)
-  goresult<-read.csv("up_dataset4_go.csv",row.names = 1)   ##51
+  goresult<-read.csv("up_train_go.csv",row.names = 1)   ##51
   goresult<-goresult[goresult$ONTOLOGY=='BP',]   #35
-  keggresult<-read.csv("up_dataset4_kegg.csv",row.names = 1)  ##0
+  keggresult<-read.csv("up_train_kegg.csv",row.names = 1)  ##0
   
-  GOPlotfun(goresult,'up_dataset4','BP')
-  keggPlotfun(keggresult,'KEGG','up_dataset4')
+  GOPlotfun(goresult[1:10,],'up_train','BP')
+  keggPlotfun(keggresult,'KEGG','up_train')
   
   ##rankprod down
-  setwd("/home/dulab/Documents/wrok/flu_paper/data/result_newest/")  
+  setwd("/home/dulab/Documents/wrok/flu_paper/data/result_fi/")  
   path1<-getwd()
   allgofun(gene_down,backgene,pic2)
-  goresultdown<-read.csv("down_dataset4_go.csv",row.names = 1)   ###32
+  goresultdown<-read.csv("down_train_go.csv",row.names = 1)   ###32
   goresultdown<-goresultdown[goresultdown$ONTOLOGY=='BP',]
-  keggresult1<-read.csv("down_dataset4_kegg.csv",row.names = 1)
-  GOPlotfun(goresultdown,'down_dataset4','BP') 
-  keggPlotfun(keggresult1,'KEGG','down_dataset4')
+  keggresult1<-read.csv("down_train_kegg.csv",row.names = 1)
+  GOPlotfun(goresultdown,'down_train','BP') 
+  keggPlotfun(keggresult1,'KEGG','down_train')
 }
 
 
 #########up and down
-setwd("/home/dulab/Documents/wrok/flu_paper/data/result_newest/")  
+setwd("/home/dulab/Documents/wrok/flu_paper/data/result_fi")  
 
 goresult$Type <- "UP"
 goresultdown$Type <- "DOWN"
 
-up_down <- rbind(goresult[1:10,],goresultdown)
+up_down <- rbind(goresult[1:5,],goresultdown[1:5,])
 up_down$Type <- factor(up_down$Type,levels = c("UP","DOWN"))
 up_down<-up_down[order(up_down$Type),]
 
@@ -256,7 +256,7 @@ up_down$Description <- factor(up_down$Description,levels = rev(up_down$Descripti
 # up_down$Description <- factor(up_down$Description,levels =rev(up_down$Description))
 allGOPlotfun <- function(goresult,picturename){
   
-  pdf(paste(picturename,"bubble.pdf",sep = "_"),height=5,width=12)
+  pdf(paste(picturename,"bubble.pdf",sep = "_"),height=6,width=6)
   
   #resultgo$GeneRatio <- as.numeric(resultgo$GeneRatio)
   pp<-ggplot(goresult,aes(Type,Description)) + geom_point(aes(color=Type,size=Count)) +
@@ -280,7 +280,7 @@ allGOPlotfun <- function(goresult,picturename){
                                                                      panel.background = element_blank(),panel.border=element_rect(fill='transparent', 
                                                                                                                                   color='black'), axis.ticks.x = element_blank(),axis.text.x=element_text(size=12),axis.text.y=element_text(size=12),
                                                                      legend.position = "right")+labs(x = " ",y="- Log10Padjust",fill="")+coord_flip()
-  pdf(paste(picturename,"bar.pdf",sep = "_"),height=5,width=12)
+  pdf(paste(picturename,"bar.pdf",sep = "_"),height=6,width=6)
   print(pp)
   dev.off()
   png(paste(picturename,"bar.png",sep = "_"),width = 800, height = 400)
@@ -289,11 +289,11 @@ allGOPlotfun <- function(goresult,picturename){
 } 
 
 
-allGOPlotfun(up_down,"up_down_dataset4")
+allGOPlotfun(up_down,"up_down_train")
 ## module genes
 ##key module genes
 
-setwd("/home/dulab/Documents/wrok/flu_paper/data/result_newest/")  
+setwd("/home/dulab/Documents/wrok/flu_paper/data/result_fi/")  
 
 allGOPlotfun <- function(goresult,picturename){
   #resultgo$GeneRatio <- as.numeric(resultgo$GeneRatio)
@@ -303,7 +303,7 @@ allGOPlotfun <- function(goresult,picturename){
                                                                                         color='black'), axis.ticks.x = element_blank(),axis.text.x=element_text(size=12,angle = 90),
                            axis.text.y=element_text(size=12),
                            legend.background = element_blank())+scale_colour_manual(values=c(
-                             "#FF80FFFF","tan"))
+                             "midnightblue","blue","greenyellow","cyan","grey60"))
   pdf(paste(picturename,"bubble.pdf",sep = "_"),height=8,width=8)
   print(pp)
   dev.off()
@@ -314,7 +314,7 @@ allGOPlotfun <- function(goresult,picturename){
   
   
   pp<- ggplot(goresult,aes(x=Description,y=logPadjust,fill=Module)) + geom_bar(position=position_dodge(), stat="identity",width = 0.6) +
-    scale_fill_manual(values=c("#FF80FFFF","tan"))+
+    scale_fill_manual(values=c( "midnightblue","blue","greenyellow","cyan","grey60"))+
     theme(panel.grid.major = element_line(colour="grey",linetype = "dotted"),
     panel.background = element_blank(),panel.border=element_rect(fill='transparent', 
      color='black'), axis.ticks.x = element_blank(),axis.text.x=element_text(size=12),
@@ -330,75 +330,106 @@ allGOPlotfun <- function(goresult,picturename){
 
 pic3<-'salmon'; pic4<-'yellow';pic5='magenta';pic6='tan';pic7='brown';pic8='green';pic9='greenyellow';pic10='turquoise';pic11='purple';
 pic12='red';pic13='cyan';pic14='lightcyan';pic15='pink'
-backgene<-read.csv('exprs_train.csv',row.names = 1)   #72*8286
+backgene<-read.csv('h3n2_combat_data_train.csv',row.names = 1)   #72*8286
 
-tangenes<-read.csv('tangenes_train.csv',row.names = 1) 
+#tangenes<-read.csv('tangenes_train.csv',row.names = 1) 
 midnightblue<-read.csv('midnightbluegenes_train.csv',row.names = 1) 
-greengenes<-read.csv('greengenes_train.csv',row.names = 1) 
+#greengenes<-read.csv('greengenes_train.csv',row.names = 1) 
 #yellowgenes<-read.csv('yellowgenes_train.csv',row.names = 1)
 #salmongenes<-read.csv('salmongenes_train.csv',row.names = 1)
-magentagenes<-read.csv('magentagenes_train.csv',row.names = 1)
+#magentagenes<-read.csv('magentagenes_train.csv',row.names = 1)
 #purplegenes<-read.csv('purplegenes_train.csv',row.names = 1)
 #redgenes<-read.csv('redgenes_train.csv',row.names = 1)
-#bluegenes<-read.csv("bluegenes_train.csv",row.names = 1)
-#greenyellow<-read.csv('greenyellowgenes_train.csv',row.names = 1)
-#cyangenes<-read.csv('cyangenes.csv',row.names = 1)
-#lightcyan<-read.csv('lightcyangenes.csv',row.names = 1)
+bluegenes<-read.csv("bluegenes_train.csv",row.names = 1)
+greenyellow<-read.csv('greenyellowgenes_train.csv',row.names = 1)
+cyangenes<-read.csv('cyangenes_train.csv',row.names = 1)
+#lightcyangenes<-read.csv('lightcyangenes_train.csv',row.names = 1)
+#royalblue<-read.csv('royalbluegenes_train.csv',row.names = 1)
+grey60<-read.csv('grey60genes_train.csv',row.names = 1)
+#darkgreengenes<-read.csv("darkgreengenes_train.csv",row.names = 1)
+#turquoisegenes<-read.csv("turquoisegenes_train.csv",row.names = 1)
+
 #pinkgenes<-read.csv('pinkgenes.csv',row.names = 1)
 #backgene2<-as.data.frame(t(read.csv("~/result1/2WGCNA/h3n2_wgcnaexprs_4143.csv",row.names = 1)))
-blackgenes<-read.csv('blackgenes_train.csv',row.names = 1) 
+#blackgenes<-read.csv('blackgenes_train.csv',row.names = 1) 
 
 path1<-getwd()
-allgofun1(tangenes,backgene,"tan_train")
-setwd(path1)
-allgofun1(magentagenes,backgene,"magenta_train")
-setwd(path1)
+#allgofun1(tangenes,backgene,"tan_train")
+#setwd(path1)
+#allgofun1(magentagenes,backgene,"magenta_train")
+#setwd(path1)
 #allgofun1(purplegenes,backgene,"purple_train")
 #setwd(path1)
-#allgofun1(greenyellow,backgene,"greenyellow_train")
-#setwd(path1)
+allgofun1(greenyellow,backgene,"greenyellow_train")
+setwd(path1)
 allgofun1(midnightblue,backgene,"midightblue_train")
 setwd(path1)
-
-allgofun1(blackgenes,backgene,"black_train")
+allgofun1(bluegenes,backgene,"blue_train")
 setwd(path1)
-allgofun1(greengenes,backgene,"green_train")
+#allgofun1(blackgenes,backgene,"black_train")
+#setwd(path1)
+#allgofun1(greengenes,backgene,"green_train")
+#setwd(path1)
+allgofun1(cyangenes,backgene,"cyan_train")
 setwd(path1)
-#allgofun1(cyangenes,backgene,"cyan_train")
+#allgofun1(lightcyangenes,backgene,"lightcyan_train")
+#setwd(path1)
+allgofun1(grey60,backgene,"grey60_train")
+setwd(path1)
+#allgofun1(darkgreengenes,backgene,"darkgreen_train")
 #setwd(path1)
 
-tangoresult<-read.csv('tan_train/tan_train_go.csv',row.names = 1)   ##13
-tangoresult<- tangoresult[tangoresult$ONTOLOGY=='BP' | tangoresult$ONTOLOGY=='MF',]
-midnightbluegoresult<-read.csv('midightblue_train/midightblue_train_go.csv',row.names = 1)   ##13
-midnightbluegoresult<- midnightbluegoresult[midnightbluegoresult$ONTOLOGY=='BP' | midnightbluegoresult$ONTOLOGY=='MF',]
+#allgofun1(turquoisegenes,backgene,"turquoise_train")
+#setwd(path1)
 
-magentagoresult<-read.csv('magenta_train/magenta_train_go.csv',row.names = 1)   ##1
-magentagoresult<- magentagoresult[magentagoresult$ONTOLOGY=='BP' | magentagoresult$ONTOLOGY=='MF',]
+#allgofun1(royalblue,backgene,"royalblue_train")
+#setwd(path1)
+
+
+#tangoresult<-read.csv('tan_train/tan_train_go.csv',row.names = 1)   ##13
+#tangoresult<- tangoresult[tangoresult$ONTOLOGY=='BP' | tangoresult$ONTOLOGY=='MF',]
+cyangoresult<-read.csv('cyan_train/cyan_train_go.csv',row.names = 1)   ##13
+#cyangoresult<- cyangoresult[tangoresult$ONTOLOGY=='BP' | tangoresult$ONTOLOGY=='MF',]
+midnightbluegoresult<-read.csv('midightblue_train/midightblue_train_go.csv',row.names = 1)   ##13
+#midnightbluegoresult<- midnightbluegoresult[midnightbluegoresult$ONTOLOGY=='BP' | midnightbluegoresult$ONTOLOGY=='MF',]
+
+#magentagoresult<-read.csv('magenta_train/magenta_train_go.csv',row.names = 1)   ##1
+#magentagoresult<- magentagoresult[magentagoresult$ONTOLOGY=='BP' | magentagoresult$ONTOLOGY=='MF',]
 
 #purplegoresult<-read.csv('purple_train/purple_train_go.csv',row.names = 1)   ##52
 #purplegoresult<- purplegoresult[purplegoresult$ONTOLOGY=='BP' | purplegoresult$ONTOLOGY=='MF',]
-blackgoresult<-read.csv('black_train/black_train_go.csv',row.names = 1)   ##1
-blackgoresult<- blackgoresult[blackgoresult$ONTOLOGY=='BP' | blackgoresult$ONTOLOGY=='MF',]
-greengoresult<-read.csv('green_train/green_train_go.csv',row.names = 1)   ##1
-greengoresult<- greengoresult[greengoresult$ONTOLOGY=='BP' | greengoresult$ONTOLOGY=='MF',]
+#blackgoresult<-read.csv('black_train/black_train_go.csv',row.names = 1)   ##1
+#blackgoresult<- blackgoresult[blackgoresult$ONTOLOGY=='BP' | blackgoresult$ONTOLOGY=='MF',]
+#greengoresult<-read.csv('green_train/green_train_go.csv',row.names = 1)   ##1
+#greengoresult<- greengoresult[greengoresult$ONTOLOGY=='BP' | greengoresult$ONTOLOGY=='MF',]
+grey60goresult<-read.csv('grey60_train/grey60_train_go.csv',row.names = 1)   ##13
+#grey60goresult<- grey60goresult[grey60goresult$ONTOLOGY=='BP' | grey60goresult$ONTOLOGY=='MF',]
 
+bluegoresult<-read.csv('blue_train/blue_train_go.csv',row.names = 1)   ##13
+#bluegoresult<- bluegoresult[bluegoresult$ONTOLOGY=='BP' | bluegoresult$ONTOLOGY=='MF',]
 
-#greenyellowgoresult<-read.csv('greenyellow_train/greenyellow_train_go.csv',row.names = 1)   ##16
+greenyellowgoresult<-read.csv('greenyellow_train/greenyellow_train_go.csv',row.names = 1)   ##16
 #greenyellowgoresult<-greenyellowgoresult[greenyellowgoresult$ONTOLOGY=='BP' |greenyellowgoresult$ONTOLOGY=='MF',]
 
 
 
-tangoresult$Module <- "MEtan"
-magentagoresult$Module <- "MEmagenta"
+#tangoresult$Module <- "MEtan"
+#magentagoresult$Module <- "MEmagenta"
 #purplegoresult$Module <- "MEpurple"
-#greenyellowgoresult$Module <- "MEgreenyellow"
+greenyellowgoresult$Module <- "MEgreenyellow"
+cyangoresult$Module <- "MEcyan"
+grey60goresult$Module <- "MEgrey60"
+bluegoresult$Module <- "MEblue"
+midnightbluegoresult$Module <- "MEmidnightblue"
 
-all_me <- rbind(magentagoresult,tangoresult[1:10,])#purplegoresult,,tangoresult[1:5,]magentagoresult[1:5,],
-#all_me$Module <- factor(all_me$Module,levels = c("MEpurple","MEmagenta","MEgreenyellow","MEtan"))
+
+all_me <- rbind(midnightbluegoresult[1:5,],bluegoresult[1:5,],greenyellowgoresult[1:5,],
+                cyangoresult[1:5,],grey60goresult[1:5,])#purplegoresult,,tangoresult[1:5,]magentagoresult[1:5,],
+all_me$Module <- factor(all_me$Module,levels = c("MEmidnightblue","MEblue","MEgreenyellow","MEcyan","MEgrey60"))
 all_me<-all_me[order(all_me$Module),]
-all_me$Description<-factor(all_me$Description,levels = all_me$Description)
+all_me$Description<-factor(all_me$Description,levels = all_me[-24,]$Description)
 # all_me$Description <- factor(all_me$Description,levels =rev(all_me$Description))
-allGOPlotfun(all_me,"dataset4_me")
+allGOPlotfun(all_me,"train")
 
 
 pp<-ggplot(all_me,aes(Module,Description)) + geom_point(aes(color=Module,size=logPadjust)) +
@@ -407,13 +438,80 @@ pp<-ggplot(all_me,aes(Module,Description)) + geom_point(aes(color=Module,size=lo
                                                                                       color='black'), axis.ticks.x = element_blank(),axis.text.x=element_text(size=12,angle = 90),
                          axis.text.y=element_text(size=12),
                          legend.background = element_blank())+scale_colour_manual(values=c(
-                          "#FF80FFFF","tan"))
+                          "midnightblue","blue","greenyellow","cyan","grey60"))
 
-pdf(paste("dataset4_me","bubble.pdf",sep = "_"),height=6,width=8)
+pdf(paste("train_me","bubble.pdf",sep = "_"),height=6,width=8)
 print(pp)
 dev.off()
 
 
+#magentagoresult<-read.csv('magenta_train/magenta_train_kegg.csv',row.names = 1)   ##0
+#magentagoresult$Module <- "MEmagenta"
+greenyellowgoresult<-read.csv('greenyellow_train/greenyellow_train_kegg.csv',row.names = 1)   ##4
+greenyellowgoresult$Module <- "MEgreenyellow"
+#greengoresult<-read.csv('green_train/green_train_kegg.csv',row.names = 1)   ##4
+#greengoresult$Module <- "MEgreen"
+#tangoresult<-read.csv('tan_train/tan_train_kegg.csv',row.names = 1)   ##0
+#tangoresult$Module<-"MEtan"
+midnightbluegoresult<-read.csv('midightblue_train/midightblue_train_kegg.csv',row.names = 1)   ##0
+midnightbluegoresult$Module<-"MEmidnightblue"
+
+#redgoresult<-read.csv('red_train/red_train_kegg.csv',row.names = 1)   ##0
+#redgoresult$Module<-"MEred"
+cyangoresult<-read.csv('cyan_train/cyan_train_kegg.csv',row.names = 1)   ##0
+cyangoresult$Module<-"MEcyan"
+#blackgoresult<-read.csv('black_train/black_train_kegg.csv',row.names = 1)   ##0
+#blackgoresult$Module<-"MEblack"
+grey60goresult<-read.csv('grey60_train/grey60_train_kegg.csv',row.names = 1)   ##13
+grey60goresult$Module<-"MEgrey60"
+
+#grey60goresult<- grey60goresult[grey60goresult$ONTOLOGY=='BP' | grey60goresult$ONTOLOGY=='MF',]
+
+bluegoresult<-read.csv('blue_train/blue_train_kegg.csv',row.names = 1)   ##13
+#bluegoresult<- bluegoresult[bluegoresult$ONTOLOGY=='BP' | bluegoresult$ONTOLOGY=='MF',]
+bluegoresult$Module<-"MEblue"
+
+
+all_me <- rbind(greenyellowgoresult,cyangoresult)#,)tangoresult,purplegoresult
+all_me$Module <- factor(all_me$Module,levels = c("MEgreenyellow","MEcyan"))
+
+all_me<-all_me[order(all_me$Module),]
+all_me$Description<-factor(all_me$Description,levels = all_me$Description)
+allGOPlotfun <- function(goresult,picturename){
+  #resultgo$GeneRatio <- as.numeric(resultgo$GeneRatio)
+  pp<-ggplot(goresult,aes(Module,Description)) + geom_point(aes(color=Module,size=logPadjust)) +
+    labs(x="",y="") +theme(panel.grid.major = element_line(colour="grey",linetype = "dotted"),
+                           panel.background = element_blank(),panel.border=element_rect(fill='transparent', 
+                                                                                        color='black'), axis.ticks.x = element_blank(),axis.text.x=element_text(size=12,angle = 90),
+                           axis.text.y=element_text(size=12),
+                           legend.background = element_blank())+scale_colour_manual(values=c(
+                             "greenyellow","cyan"))
+  pdf(paste(picturename,"bubble.pdf",sep = "_"),height=7,width=6)
+  print(pp)
+  dev.off()
+  png(paste(picturename,"bubble.png",sep = "_"),width = 800, height = 800)
+  print(pp)
+  dev.off()
+  
+  
+  
+  pp<- ggplot(goresult,aes(x=Description,y=logPadjust,fill=Module)) + geom_bar(position=position_dodge(), stat="identity",width = 0.6) +
+    scale_fill_manual(values=c("greenyellow","cyan"))+
+    theme(panel.grid.major = element_line(colour="grey",linetype = "dotted"),
+          panel.background = element_blank(),panel.border=element_rect(fill='transparent', 
+                                                                       color='black'), axis.ticks.x = element_blank(),axis.text.x=element_text(size=12),
+          axis.text.y=element_text(size=12),
+          legend.position = "right")+labs(x = " ",y="- Log10Padjust",fill="")+coord_flip()
+  pdf(paste(picturename,"bar.pdf",sep = "_"),height=8,width=6)
+  print(pp)
+  dev.off()
+  png(paste(picturename,"bar.png",sep = "_"),width = 800, height = 800)
+  print(pp)
+  dev.off()
+}
+allGOPlotfun(all_me,"train_me_kegg")
+
+########################################################################
 tangoresult$Module <- "MEtan"
 magentagoresult$Module <- "MEmagenta"
 #redgoresult$Module <- "MEred"
@@ -437,7 +535,7 @@ allGOPlotfun1 <- function(goresult,picturename){
                                                                                         color='black'), axis.ticks.x = element_blank(),axis.text.x=element_text(size=12,angle = 90),
                            axis.text.y=element_text(size=12),
                            legend.background = element_blank())+scale_colour_manual(values=c(
-                             "#FF80FFFF","midnightblue","black","green","tan"))
+                             "midnightblue","blue","greenyellow","cyan","grey60"))
   pdf(paste(picturename,"bubble.pdf",sep = "_"),height=6,width=8)
   print(pp)
   dev.off()
@@ -448,7 +546,7 @@ allGOPlotfun1 <- function(goresult,picturename){
   
   
   pp<- ggplot(goresult,aes(x=Description,y=logPadjust,fill=Module)) + geom_bar(position=position_dodge(), stat="identity",width = 0.6) +
-    scale_fill_manual(values=c("#FF80FFFF","midnightblue","black","green","tan"))+
+    scale_fill_manual(values=c( "midnightblue","blue","greenyellow","cyan","grey60"))+
     theme(panel.grid.major = element_line(colour="grey",linetype = "dotted"),
           panel.background = element_blank(),panel.border=element_rect(fill='transparent', 
                                                                        color='black'), axis.ticks.x = element_blank(),axis.text.x=element_text(size=12),
@@ -461,7 +559,7 @@ allGOPlotfun1 <- function(goresult,picturename){
   print(pp)
   dev.off()
 } 
-allGOPlotfun1(all_me,"dataset4_me1")
+allGOPlotfun1(all_me,"train_me1")
 
 #tangoresult<-read.csv('tan_train/tan_train_kegg.csv',row.names = 1)   ##0
 
@@ -478,7 +576,7 @@ tangoresult$Module <- "MEtan"
 all_me <- rbind(magentagoresult[1:10,],tangoresult)#,),purplegoresult,greenyellowgoresult
 all_me<-all_me[order(all_me$Module),]
 all_me$Description<-factor(all_me$Description,levels = all_me$Description)
-allGOPlotfun(all_me,"dataset4_me_kegg")
+allGOPlotfun(all_me,"train_me_kegg")
 
 
 ####################################################333
@@ -537,7 +635,7 @@ allGOPlotfun <- function(goresult,picturename){
   print(pp)
   dev.off()
 }
-allGOPlotfun(all_me,"dataset4_me_kegg1")
+allGOPlotfun(all_me,"train_me_kegg1")
 
 
 

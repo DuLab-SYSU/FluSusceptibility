@@ -1,4 +1,4 @@
-setwd("/home/dulab/Documents/wrok/flu_paper/data/result_newest/")  
+setwd("/home/dulab/Documents/wrok/flu_paper/data/result_fi/")  
 library(ggplot2)
 library(reshape)
 library(reshape2)
@@ -34,52 +34,7 @@ panel.background = element_blank(),panel.border=element_rect(fill='transparent',
 color='black'), axis.ticks.x = element_blank(),axis.text.x=element_text(size=12),
                                          axis.text.y=element_text(size=12),
                                          legend.background = element_blank())
-########
-GOPlotfun <- function(goresult,picturename1,picturename2){
-  #goresult <- goresult[1:10,]
-  #goresult<-term_numfun(goresult)
-  goresult<-as.data.frame(t(apply(goresult,1,term_lengthfun)))
-  goresult$logPadjust<-as.numeric(as.character(goresult$logPadjust))
-  goresult$Count<-as.numeric(as.character(goresult$Count))
-  goresult<-goresult[order(goresult$logPadjust,decreasing = T),]
-  goresult$Description <- factor(goresult$Description,levels = rev(goresult$Description))
-  goresult$geneRatio <- apply(goresult,1,generationfun)
-  goresult$geneRatio<-as.numeric(as.character(goresult$geneRatio))
-  
-  pp<-ggplot(goresult,aes(logPadjust,Description)) + 
-    geom_point(aes(color=geneRatio,size=Count)) +
-    labs(x="- Log10Padjust",y="",fill="") +
-    scale_colour_gradient(low="green",high="red")+
-    theme(panel.grid.major = element_line(colour="grey",linetype = "dotted"),
-          panel.background = element_blank(),
-          panel.border=element_rect(fill='transparent', color='black'), 
-          axis.ticks.x = element_blank(),
-          axis.title.x  = element_text(size = 30),
-          axis.text.x=element_text(size=24), axis.text.y=element_text(size=30),
-          legend.background = element_blank())
-  
-  
-  pdf(paste(picturename1,picturename2,"bubble.pdf",sep = "_"),height=6,width=12)
-  print(pp)
-  dev.off()
-  
-  pp<- ggplot(goresult,aes(x=Description,y=logPadjust,fill=ONTOLOGY)) + 
-    geom_bar(position=position_dodge(0.5), stat="identity",width = 0.45) +
-    labs(x = " ",y="- Log10Padjust",fill="")+
-    scale_fill_manual(values=c("#085A9C","#D4C009","#CC3333"))+
-    theme(panel.grid.major = element_line(colour="grey",linetype = "dotted"), 
-          panel.background = element_blank(),
-          panel.border=element_rect(fill='transparent', color='black'), 
-          axis.ticks.x = element_blank(),
-          axis.title.y = element_text(size = 30),
-          axis.text.x=element_text(size=24), axis.text.y=element_text(size=30),
-          legend.position = "right")+
-    coord_flip()
-  
-  pdf(paste(picturename1,picturename2,"bar.pdf",sep = "_"),height=6,width=12)
-  print(pp)
-  dev.off()
-}
+
 ##################ROC curve
 plotROC <- function(.data, predict_col, target, group, picturename,positive=1, all=TRUE){
   if(!(require(tidyverse) & require(plotROC))){
@@ -124,40 +79,40 @@ plotROC <- function(.data, predict_col, target, group, picturename,positive=1, a
 }
 
 ####all_data
-group<-c(1, 1, 1, 1, 1, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 0, 0, 0)
+group<-c(1, 1 ,1 ,1 ,1 ,1 ,1 ,1 ,1, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 
+         0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1)
 name <- ifelse(group==0,"Asymptomatic","Symptomatic")
-score <-c(0.78, 0.99 ,0.88, 0.76, 0.95, 1.,   0.99, 0.8,  0.28, 0.09, 0.04, 0.25, 0.1,  0.21,
-          0.19 ,0.11 ,0.6  ,0.98, 0.86, 0.91, 0.98, 0.98, 0.98, 0.92, 0.89, 0.26, 0.08, 0.07,
-          0.11 ,0.24, 0.04 ,0.16, 0.16, 0.84, 0.93, 0.74, 0.94, 0.96, 0.01, 0.05, 0.17)
+score <-c(0.91489362, 0.93617021, 0.91489362, 0.80851064, 0.91489362,
+          0.93617021, 0.70212766, 0.95744681, 0.95744681, 0.14893617,
+          0.04255319, 0.29787234, 0.19148936, 0.31914894, 0.19148936,
+          0.14893617, 0.19148936, 0.87234043, 0.89361702, 0.87234043,
+          0.85106383, 0.93617021, 0.89361702, 0.85106383, 0.9787234 ,
+          0.82978723, 0.82978723, 0.95744681, 0.82978723, 0.91489362,
+          0.27659574, 0.08510638, 0.27659574, 0.21276596, 0.08510638,
+          0.29787234, 0.21276596, 0.12765957, 0.17021277, 0.14893617,
+          0.42553191, 0.74468085, 0.93617021, 0.89361702, 0.80851064,
+          0.70212766, 0.91489362, 0.95744681, 0.91489362)
 roc_df <- data.frame(group,score,name)
 
 
 plotROC(roc_df, predict_col = score, target = group, group = name,"all_data", positive = 1)
-########## data 4
+########## 
 #######
-group<-c(1, 1, 0, 1, 0, 1, 1, 0)
+group<-c(1, 1, 1, 0, 1, 0, 1, 1, 1, 0, 1)
 name <- ifelse(group==0,"Asymptomatic","Symptomatic")
-score <-c(0.35, 0.64, 0.13, 0.26, 0.09, 0.14, 0.95, 0.47)
+score <-c(0.79032258, 0.82258065 ,0.61290323, 0.62903226 ,0.59677419, 0.32258065,
+          0.53225806, 0.66129032, 0.75806452 ,0.48387097, 0.74193548)
 roc_df <- data.frame(group,score,name)
 
 
-plotROC(roc_df, predict_col = score, target = group, group = name,"data4", positive = 1)
+plotROC(roc_df, predict_col = score, target = group, group = name,"test", positive = 1)
 
 ########## data 4 _GSE30550
-#######
-group<-c(1, 0, 0, 0, 1, 1, 1, 1, 0, 1, 0, 1, 1, 0, 1, 0, 0)
-name <- ifelse(group==0,"Asymptomatic","Symptomatic")
-score <-c(0.78723404, 0.44680851, 0.04255319, 0.29787234, 0.76595745, 0.89361702,
-          1.         ,0.5106383,  0.4893617,  0.93617021, 0.04255319, 0.95744681,
-          0.85106383 ,0.10638298, 0.76595745, 0.12765957, 0.25531915)
-roc_df <- data.frame(group,score,name)
 
-
-plotROC(roc_df, predict_col = score, target = group, group = name,"data4_GSE30550", positive = 1)
 
 ######################## importence
 ###all_data
-hub_importance <- read.csv("/home/dulab/Documents/wrok/C/deg_module__inter_importance_all.csv")
+hub_importance <- read.csv("deg_module__inter_importance_all.csv")
 hub_importance<-hub_importance[,-1]
 hub_importance$type <- "importance of module and deg genes"
 hub_importance<-hub_importance[order(hub_importance$importance,decreasing = F),]
@@ -165,20 +120,14 @@ hub_importance$gene <- factor(hub_importance$gene,levels = hub_importance$gene)
 rownames(hub_importance)<-hub_importance$gene
 pp<-ggplot(hub_importance,aes(x=gene,y=importance,fill=-importance))+geom_bar(stat="identity")+ labs(x = " ",y="Importance",fill="")+
   mytheme+coord_flip()
-pdf(paste("importance","all.pdf",sep = "_"),height=5,width=5)
+pdf(paste("importance","_all.pdf",sep = ""),height=5,width=5)
 print(pp)
 dev.off()
-backgene<-read.csv('h3n2_combat_data1.csv',row.names = 1)   #72*8286
-allgofun(hub_importance,backgene,"deg_module_inter_importance_all")
-goresult<-read.csv("deg_module_inter_importance_all_go.csv",row.names = 1)   ##24
-goresult$type <- "all"
-#goresult<-goresult[goresult$ONTOLOGY=='BP',]   #19
-keggresult<-read.csv("deg_module_inter_importance_all_kegg.csv",row.names = 1)  ##0
-GOPlotfun(goresult,'dm_me_inter','all')
-keggPlotfun(keggresult,'KEGG_dm_me_inter','all')
+
+
 
 #########data4
-hub_importance <- read.csv("/home/dulab/Documents/wrok/C/deg_module__inter_importance_train.csv")
+hub_importance <- read.csv("deg_module__inter_importance_train.csv")
 hub_importance<-hub_importance[,-1]
 hub_importance$type <- "importance of module and deg genes"
 hub_importance<-hub_importance[order(hub_importance$importance,decreasing = F),]
@@ -186,9 +135,8 @@ hub_importance$gene <- factor(hub_importance$gene,levels = hub_importance$gene)
 rownames(hub_importance)<-hub_importance$gene
 pp<-ggplot(hub_importance,aes(x=gene,y=importance,fill=-importance))+geom_bar(stat="identity")+ labs(x = " ",y="Importance",fill="")+
   mytheme+coord_flip()
-pdf(paste("importance","data4.pdf",sep = "_"),height=5,width=5)
+pdf(paste("importance","_train.pdf",sep = ""),height=5,width=5)
 print(pp)
 dev.off()
-
 
 
